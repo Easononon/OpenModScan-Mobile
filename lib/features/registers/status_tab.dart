@@ -261,6 +261,7 @@ class _StatusTabState extends State<_StatusTab> {
         displayAddress: _addressType.toReferenceDisplay(address),
         value: value,
         demonstration: demonstration,
+        observed: runtime != null,
         previousValue: runtime?.previous ?? reference?.previousValue,
         comment: configByAddress[address]?.comment ?? reference?.comment ?? '',
         timestamp: runtime?.readAt == null
@@ -403,9 +404,7 @@ class _StatusTabState extends State<_StatusTab> {
                     displayAddress: entry.address,
                     addressBase: AppSettings.instance.addressBaseStart,
                     newValue: value ? 'ON' : 'OFF',
-                    knownOldValue: entry.demonstration
-                        ? null
-                        : (entry.value ? 'ON' : 'OFF'),
+                    knownOldValue: entry.knownCoilState,
                   ),
                 ),
           actions: [

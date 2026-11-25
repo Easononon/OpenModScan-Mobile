@@ -4,6 +4,7 @@ import '../../models/app_settings.dart';
 import '../../models/register_entry.dart';
 import '../../theme/app_dimens.dart';
 import '../../theme/app_theme.dart';
+import '../../field/address_mapping.dart';
 import '../../utils/modbus_format.dart';
 import '../../utils/value_input.dart';
 import '../../widgets/app_test_keys.dart';
@@ -133,23 +134,29 @@ class _RegisterDetailScreenState extends State<RegisterDetailScreen> {
   }
 
   String _displayPreviousValue(String raw) {
-    if (_entry.previousRawWords.isNotEmpty) {
-      return computeDisplayValue(
-        _entry.address,
-        _selectedType,
-        _entry.previousRawWords,
-        registerOrder: _registerOrder,
-        byteOrder: _byteOrder,
-      );
-    }
-    final rawInt = int.tryParse(raw);
-    if (rawInt == null) return raw;
-    return computeDisplayValue(
-      _entry.address,
-      _selectedType,
-      {_entry.address: rawInt},
-      registerOrder: _registerOrder,
-      byteOrder: _byteOrder,
+    final formatted = _entry.previousRawWords.isNotEmpty
+        ? computeDisplayValue(
+            _entry.address,
+            _selectedType,
+            _entry.previousRawWords,
+            registerOrder: _registerOrder,
+            byteOrder: _byteOrder,
+          )
+        : () {
+            final rawInt = int.tryParse(raw);
+            if (rawInt == null) return raw;
+            return computeDisplayValue(
+              _entry.address,
+              _selectedType,
+              {_entry.address: rawInt},
+              registerOrder: _registerOrder,
+              byteOrder: _byteOrder,
+            );
+          }();
+    return applyEngineeringScale(
+      formatted,
+      scale: _entry.scale,
+      offset: _entry.offset,
     );
   }
 
@@ -197,21 +204,28 @@ class _RegisterDetailScreenState extends State<RegisterDetailScreen> {
     return [for (final type in kRegisterTypes) _Interpretation(type, v(type))];
   }
 
-  String _displayValueForType(String type) {
-    if (!_hasRawWords) return _entry.displayValue ?? _entry.value;
-    for (final interp in _buildInterpretations()) {
-      if (interp.typeName == type) return interp.value;
-    }
-    return _entry.value;
+  String _rawTypedValue(String type) {
+    if (!_hasRawWords) return _entry.value;
+    return computeDisplayValue(
+      _entry.address,
+      type,
+      _entry.rawWords,
+      registerOrder: _registerOrder,
+      byteOrder: _byteOrder,
+    );
   }
+
+  String _engineeringValue(String type) => applyEngineeringScale(
+    _rawTypedValue(type),
+    scale: _entry.scale,
+    offset: _entry.offset,
+  );
 
   Future<void> _showWriteDialog() async {
     final l10n = context.l10n;
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
-    final ctrl = TextEditingController(
-      text: _displayValueForType(_selectedType),
-    );
+    final ctrl = TextEditingController(text: _rawTypedValue(_selectedType));
     String? error;
     var writing = false;
 
@@ -397,7 +411,7 @@ class _RegisterDetailScreenState extends State<RegisterDetailScreen> {
     final tt = Theme.of(context).textTheme;
     final appColors = Theme.of(context).extension<AppColors>()!;
     final entry = _entry;
-    final currentValue = _displayValueForType(_selectedType);
+    final currentValue = _engineeringValue(_selectedType);
     final valueColor = _valueColor(context, entry.valueState);
     final showPreviousValue =
         entry.previousValue != null &&
@@ -609,9 +623,14 @@ class _RegisterDetailScreenState extends State<RegisterDetailScreen> {
               SectionHeader(l10n.scaleTitle),
               const SizedBox(height: 7),
               _ScaleCard(
-                scale: widget.entry.scale,
-                offset: widget.entry.offset,
-                onChanged: widget.onScaleChanged!,
+                scale: _entry.scale,
+                offset: _entry.offset,
+                onChanged: (scale, offset) {
+                  setState(() {
+                    _entry = _entry.copyWith(scale: scale, offset: offset);
+                  });
+                  widget.onScaleChanged!(scale, offset);
+                },
               ),
             ],
           ],

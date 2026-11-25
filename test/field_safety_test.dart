@@ -9,7 +9,9 @@ import 'package:omodscan_mobile/models/app_settings.dart';
 import 'package:omodscan_mobile/models/device_info.dart';
 import 'package:omodscan_mobile/models/modbus_scan.dart';
 import 'package:omodscan_mobile/models/register_address_type.dart';
+import 'package:omodscan_mobile/models/register_entry.dart';
 import 'package:omodscan_mobile/models/register_list.dart';
+import 'package:omodscan_mobile/models/status_entry.dart';
 import 'package:omodscan_mobile/runtime/runtime_ports.dart';
 import 'package:omodscan_mobile/services/connection_manager.dart';
 import 'package:omodscan_mobile/services/device_scanner.dart';
@@ -113,6 +115,45 @@ void main() {
     );
     expect(coil.pduAddress, 0);
     expect(coil.referenceAddress, 1);
+  });
+
+  test('a scaled reading is not the raw value written back', () {
+    const entry = RegisterEntry(
+      address: 0,
+      value: '100',
+      displayValue: '10',
+      typeName: 'UInt16',
+      rawWords: {0: 100},
+      scale: 0.1,
+    );
+
+    expect(rawTypedRegisterValue(entry), '100');
+    expect(encodeRegisterValue('UInt16', rawTypedRegisterValue(entry)), [100]);
+    expect(
+      computeDisplayValue(0, 'UInt16', entry.rawWords, scale: 0.1),
+      '10',
+    );
+  });
+
+  test('an unread coil is not reported as a known OFF', () {
+    const unread = StatusEntry(address: 0, value: false, comment: '');
+    const readOff = StatusEntry(
+      address: 0,
+      value: false,
+      comment: '',
+      observed: true,
+    );
+    const demo = StatusEntry(
+      address: 0,
+      value: true,
+      comment: '',
+      observed: true,
+      demonstration: true,
+    );
+
+    expect(unread.knownCoilState, isNull);
+    expect(readOff.knownCoilState, 'OFF');
+    expect(demo.knownCoilState, isNull);
   });
 
   test('engineering scale changes display only', () {

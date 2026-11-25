@@ -92,6 +92,25 @@ String computeDisplayValue(
   return applyEngineeringScale(formatted, scale: scale, offset: offset);
 }
 
+/// Typed register text with scale and offset left at identity.
+///
+/// This is the string a write encodes. [RegisterEntry.displayValue] may already
+/// be an engineering-unit reading and must not be sent as the raw value.
+String rawTypedRegisterValue(
+  RegisterEntry entry, {
+  String? registerOrder,
+  String? byteOrder,
+}) {
+  if (entry.rawWords.isEmpty) return entry.value;
+  return computeDisplayValue(
+    entry.address,
+    entry.typeName,
+    entry.rawWords,
+    registerOrder: registerOrder,
+    byteOrder: byteOrder,
+  );
+}
+
 /// Encodes a typed user value into raw uint16 words in address order.
 ///
 /// This is the inverse of [computeDisplayValue] for the register formats the UI

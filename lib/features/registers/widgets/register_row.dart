@@ -266,7 +266,8 @@ Future<void> _showWriteRegisterDialog(
   final l10n = context.l10n;
   final cs = Theme.of(context).colorScheme;
   final tt = Theme.of(context).textTheme;
-  final ctrl = TextEditingController(text: entry.displayValue ?? entry.value);
+  final rawValue = rawTypedRegisterValue(entry);
+  final ctrl = TextEditingController(text: rawValue);
   String? error;
   var writing = false;
 
@@ -328,7 +329,7 @@ Future<void> _showWriteRegisterDialog(
                     newValue: value.text,
                     knownOldValue:
                         entry.valueState == RegisterValueState.received
-                        ? (entry.displayValue ?? entry.value)
+                        ? rawValue
                         : null,
                   ),
                 ),
