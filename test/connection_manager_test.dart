@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:omodscan_mobile/models/app_settings.dart';
 import 'package:omodscan_mobile/models/device_info.dart';
 import 'package:omodscan_mobile/services/connection_manager.dart';
 
@@ -11,6 +12,7 @@ void main() {
 
   setUp(() async {
     await resetAppTestState();
+    await AppSettings.instance.setWriteEnabled(true);
     manager = ConnectionManager.instance;
     await manager.resetForTesting();
   });

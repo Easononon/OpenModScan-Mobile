@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
+import '../../app_flags.dart';
+import '../../field/write_plan.dart';
 import '../../l10n/l10n.dart';
 import '../../models/device_info.dart';
 import '../../models/app_settings.dart';
@@ -13,6 +15,7 @@ import '../../models/status_entry.dart';
 import '../../services/modbus_client.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/connection_info_bar.dart';
+import '../../widgets/write_confirm_body.dart';
 import '../../widgets/connection_status_chip.dart';
 import '../../widgets/device_select_sheet.dart';
 import '../../widgets/error_feedback.dart';
@@ -311,6 +314,9 @@ class _RegistersScreenState extends State<RegistersScreen>
     final selectedDeviceConnected =
         _selectedDevice != null &&
         widget.controller.isConnected(_selectedDevice!);
+    final selectedModbusVerified =
+        _selectedDevice != null &&
+        widget.controller.isModbusVerified(_selectedDevice!);
     final appColors = Theme.of(context).extension<AppColors>()!;
     final effectiveRegisterValueState = _effectiveValueState(
       _registerValueState,
@@ -348,6 +354,7 @@ class _RegistersScreenState extends State<RegistersScreen>
             const SizedBox(height: 2),
             ConnectionStatusChip(
               connected: selectedDeviceConnected,
+              modbusVerified: selectedModbusVerified,
               label: showValueException
                   ? activeValueStatusLabel ?? 'Modbus exception'
                   : null,
@@ -477,6 +484,10 @@ class _RegistersScreenState extends State<RegistersScreen>
                       valuesListenable: widget.controller,
                       liveValueAt: (address) =>
                           widget.controller.runtimeValues[address],
+                      device: _selectedDevice,
+                      onScaleChanged: (address, scale, offset) => widget
+                          .controller
+                          .updateEngineeringScale(address, scale, offset),
                     ),
                     _StatusTab(
                       statusType: active.coilType,
@@ -507,6 +518,7 @@ class _RegistersScreenState extends State<RegistersScreen>
                       onEntryChanged: (address, comment) => widget.controller
                           .updateStatusEntry(active.coilType, address, comment),
                       onValueWritten: _onStatusValueWritten,
+                      device: _selectedDevice,
                     ),
                   ],
                 ),

@@ -1,3 +1,4 @@
+import '../field/field_transport.dart';
 import 'register_list.dart';
 
 enum ProtocolType { modbusTcp, modbusRtuIp }
@@ -32,6 +33,11 @@ class DeviceInfo {
   final DateTime? lastConnectedAt;
   final DeviceMarkerColor markerColor;
   final List<RegisterList> registerLists;
+  final SerialWiringNote serialWiring;
+
+  /// First version always uses the phone's TCP socket. Stored so a later
+  /// USB or Bluetooth transport cannot be implied by a missing field.
+  final FieldTransport transport;
 
   DeviceInfo({
     String? id,
@@ -47,6 +53,8 @@ class DeviceInfo {
     this.lastConnectedAt,
     this.markerColor = DeviceMarkerColor.blue,
     List<RegisterList>? registerLists,
+    this.serialWiring = const SerialWiringNote(),
+    this.transport = FieldTransport.wifiTcp,
   }) : id = id ?? _nextId(),
        createdAt = createdAt ?? DateTime.now(),
        registerLists = registerLists ?? [];
@@ -69,6 +77,8 @@ class DeviceInfo {
     bool clearLastConnectedAt = false,
     DeviceMarkerColor? markerColor,
     List<RegisterList>? registerLists,
+    SerialWiringNote? serialWiring,
+    FieldTransport? transport,
   }) {
     return DeviceInfo(
       id: id ?? this.id,
@@ -86,6 +96,8 @@ class DeviceInfo {
           : lastConnectedAt ?? this.lastConnectedAt,
       markerColor: markerColor ?? this.markerColor,
       registerLists: registerLists ?? List.of(this.registerLists),
+      serialWiring: serialWiring ?? this.serialWiring,
+      transport: transport ?? this.transport,
     );
   }
 
@@ -110,6 +122,8 @@ class DeviceInfo {
     'lastConnectedAt': lastConnectedAt?.toIso8601String(),
     'markerColor': markerColor.name,
     'registerLists': registerLists.map((l) => l.toJson()).toList(),
+    ...serialWiring.toJson(),
+    'transport': transport.name,
   };
 
   factory DeviceInfo.fromJson(
@@ -134,6 +148,16 @@ class DeviceInfo {
     registerLists: (json['registerLists'] as List<dynamic>? ?? [])
         .map((e) => RegisterList.fromJson(e as Map<String, dynamic>))
         .toList(),
+    serialWiring: SerialWiringNote.fromJson(json),
+    transport: _transportFromJson(json['transport']),
+  );
+}
+
+FieldTransport _transportFromJson(Object? value) {
+  if (value is! String) return FieldTransport.wifiTcp;
+  return FieldTransport.values.firstWhere(
+    (transport) => transport.name == value && transport.available,
+    orElse: () => FieldTransport.wifiTcp,
   );
 }
 

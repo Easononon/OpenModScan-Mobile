@@ -27,6 +27,10 @@ void main() {
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     await AppSettings.instance.resetToDefaults();
+    // These widget tests exercise the write controls. The product default is
+    // read-only with confirmation; turn that on explicitly here.
+    await AppSettings.instance.setWriteEnabled(true);
+    await AppSettings.instance.setConfirmBeforeWrite(false);
     await DeviceRepository.instance.replaceAll(List.of(demoDevices));
   });
 

@@ -53,6 +53,7 @@ class RegisterDetailScreen extends StatefulWidget {
   onValueWritten;
   final Listenable? valuesListenable;
   final RegisterRuntimeValue? Function(int address)? liveValueAt;
+  final void Function(double scale, double offset)? onScaleChanged;
 
   const RegisterDetailScreen({
     super.key,
@@ -62,6 +63,7 @@ class RegisterDetailScreen extends StatefulWidget {
     this.onValueWritten,
     this.valuesListenable,
     this.liveValueAt,
+    this.onScaleChanged,
   });
 
   @override
@@ -561,6 +563,16 @@ class _RegisterDetailScreenState extends State<RegisterDetailScreen> {
               comment: _commentCtrl.text.isEmpty ? null : _commentCtrl.text,
               onChanged: _saveComment,
             ),
+            if (widget.entry.valueState == RegisterValueState.demonstration) ...[
+              const SizedBox(height: 12),
+              Text(
+                l10n.demoDataBanner,
+                style: tt.bodyMedium?.copyWith(
+                  color: appColors.warningColor,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
             if (_hasRawWords) ...[
               const SizedBox(height: 18),
               _InterpretationsHeader(
@@ -590,6 +602,16 @@ class _RegisterDetailScreenState extends State<RegisterDetailScreen> {
                     });
                   }(),
                 ),
+              ),
+            ],
+            if (widget.onScaleChanged != null) ...[
+              const SizedBox(height: 18),
+              SectionHeader(l10n.scaleTitle),
+              const SizedBox(height: 7),
+              _ScaleCard(
+                scale: widget.entry.scale,
+                offset: widget.entry.offset,
+                onChanged: widget.onScaleChanged!,
               ),
             ],
           ],
@@ -624,6 +646,7 @@ Color _valueColor(BuildContext context, RegisterValueState state) {
     RegisterValueState.received => appColors.valueColor,
     RegisterValueState.unavailable => appColors.unavailableValueColor,
     RegisterValueState.exception => appColors.exceptionValueColor,
+    RegisterValueState.demonstration => appColors.warningColor,
   };
 }
 
@@ -958,6 +981,88 @@ class _CommentSheetState extends State<_CommentSheet> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _ScaleCard extends StatefulWidget {
+  final double scale;
+  final double offset;
+  final void Function(double scale, double offset) onChanged;
+
+  const _ScaleCard({
+    required this.scale,
+    required this.offset,
+    required this.onChanged,
+  });
+
+  @override
+  State<_ScaleCard> createState() => _ScaleCardState();
+}
+
+class _ScaleCardState extends State<_ScaleCard> {
+  late final TextEditingController _scaleCtrl;
+  late final TextEditingController _offsetCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _scaleCtrl = TextEditingController(text: widget.scale.toString());
+    _offsetCtrl = TextEditingController(text: widget.offset.toString());
+  }
+
+  @override
+  void dispose() {
+    _scaleCtrl.dispose();
+    _offsetCtrl.dispose();
+    super.dispose();
+  }
+
+  void _commit() {
+    final scale = double.tryParse(_scaleCtrl.text.trim());
+    final offset = double.tryParse(_offsetCtrl.text.trim());
+    if (scale == null ||
+        offset == null ||
+        !scale.isFinite ||
+        !offset.isFinite) {
+      return;
+    }
+    widget.onChanged(scale, offset);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(l10n.scaleNote),
+        const SizedBox(height: 8),
+        TextField(
+          controller: _scaleCtrl,
+          keyboardType: const TextInputType.numberWithOptions(
+            signed: true,
+            decimal: true,
+          ),
+          decoration: InputDecoration(labelText: l10n.scaleGain),
+          onSubmitted: (_) => _commit(),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: _offsetCtrl,
+          keyboardType: const TextInputType.numberWithOptions(
+            signed: true,
+            decimal: true,
+          ),
+          decoration: InputDecoration(labelText: l10n.scaleOffset),
+          onSubmitted: (_) => _commit(),
+        ),
+        const SizedBox(height: 8),
+        Align(
+          alignment: Alignment.centerRight,
+          child: FilledButton(onPressed: _commit, child: Text(l10n.save)),
+        ),
+      ],
     );
   }
 }

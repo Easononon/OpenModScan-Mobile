@@ -650,6 +650,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         return l10n.settingsLanguageEnglish;
       case 'Russian':
         return l10n.settingsLanguageRussian;
+      case 'Chinese':
+        return l10n.settingsLanguageChinese;
       case 'System':
       default:
         return l10n.settingsLanguageSystem;

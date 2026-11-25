@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'package:modbus_client/modbus_client.dart' as modbus;
 import 'package:modbus_client_tcp/modbus_client_tcp.dart' as modbus_tcp;
 
+import '../field/modbus_link_phase.dart';
+import '../field/write_guard.dart';
 import '../models/device_info.dart';
 import '../models/modbus_exception.dart';
 import 'modbus_rtu_ip_serial_port.dart';
@@ -18,10 +20,24 @@ class ModbusClient {
 
   ModbusClient(this.device);
 
-  bool get isConnected => switch (device.protocol) {
+  ModbusLinkPhase _phase = ModbusLinkPhase.closed;
+
+  bool get _socketOpen => switch (device.protocol) {
     ProtocolType.modbusTcp => _tcpClient?.isConnected ?? false,
     ProtocolType.modbusRtuIp => _rtuClient?.isConnected ?? false,
   };
+
+  ModbusLinkPhase get linkPhase {
+    if (!_socketOpen) return ModbusLinkPhase.closed;
+    return _phase;
+  }
+
+  bool get isConnected => _socketOpen;
+
+  /// True only after a Modbus success or exception response was decoded.
+  /// A TCP socket by itself leaves this false.
+  bool get isModbusVerified =>
+      _socketOpen && _phase == ModbusLinkPhase.modbusVerified;
 
   Future<void> connect() async {
     if (!device.protocol.supportsConnection) {
@@ -51,6 +67,7 @@ class ModbusClient {
           TrafficLog.instance.setActiveDevice(null);
         }
         _tcpClient = client;
+        _phase = ModbusLinkPhase.tcpOpen;
       case ProtocolType.modbusRtuIp:
         final client =
             _rtuClient ??
@@ -70,6 +87,7 @@ class ModbusClient {
           );
         }
         _rtuClient = client;
+        _phase = ModbusLinkPhase.tcpOpen;
     }
   }
 
@@ -78,6 +96,7 @@ class ModbusClient {
     await _rtuClient?.disconnect();
     _tcpClient = null;
     _rtuClient = null;
+    _phase = ModbusLinkPhase.closed;
   }
 
   Future<List<int>> readHoldingRegisters(int startAddress, int quantity) =>
@@ -101,6 +120,7 @@ class ModbusClient {
       _readBits(modbus.ModbusElementType.discreteInput, startAddress, quantity);
 
   Future<void> writeHoldingRegister(int address, int value) async {
+    enforceNoBroadcastWrite(device.unitId);
     _validateWriteAddress(address);
     if (value < 0 || value > 0xffff) {
       throw RangeError.range(value, 0, 0xffff, 'value');
@@ -120,6 +140,7 @@ class ModbusClient {
   }
 
   Future<bool> writeHoldingRegisters(int startAddress, List<int> values) async {
+    enforceNoBroadcastWrite(device.unitId);
     _validateReadRange(startAddress, values.length);
     for (final value in values) {
       if (value < 0 || value > 0xffff) {
@@ -162,6 +183,7 @@ class ModbusClient {
   }
 
   Future<void> writeCoil(int address, bool value) async {
+    enforceNoBroadcastWrite(device.unitId);
     _validateWriteAddress(address);
 
     final coil = modbus.ModbusCoil(name: 'Coil $address', address: address);
@@ -237,14 +259,29 @@ class ModbusClient {
   /// Sends [request] while tagging the traffic log with this device, so the
   /// global library logs (TX/RX frames) are attributed to the right device.
   Future<modbus.ModbusResponseCode> _send(modbus.ModbusRequest request) async {
+    final Future<modbus.ModbusResponseCode> sent;
     if (device.protocol == ProtocolType.modbusRtuIp) {
-      return _requireClient().send(request);
+      sent = _requireClient().send(request);
+    } else {
+      TrafficLog.instance.setActiveDevice(device.id);
+      sent = _requireClient().send(request);
     }
-    TrafficLog.instance.setActiveDevice(device.id);
     try {
-      return await _requireClient().send(request);
+      final response = await sent;
+      _noteModbusResponse(response);
+      return response;
     } finally {
-      TrafficLog.instance.setActiveDevice(null);
+      if (device.protocol != ProtocolType.modbusRtuIp) {
+        TrafficLog.instance.setActiveDevice(null);
+      }
+    }
+  }
+
+  void _noteModbusResponse(modbus.ModbusResponseCode response) {
+    final exception = ModbusExceptionCode.fromCode(response.code);
+    if (response == modbus.ModbusResponseCode.requestSucceed ||
+        exception != null) {
+      _phase = ModbusLinkPhase.modbusVerified;
     }
   }
 

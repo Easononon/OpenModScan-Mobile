@@ -15,6 +15,7 @@ void main() {
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     await AppSettings.instance.resetToDefaults();
+    await AppSettings.instance.setWriteEnabled(true);
   });
 
   test('updates register config through repository', () async {

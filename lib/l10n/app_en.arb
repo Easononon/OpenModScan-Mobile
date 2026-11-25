@@ -828,5 +828,143 @@
   },
 
   "aboutLicenseMit": "MIT License",
-  "@aboutLicenseMit": {}
+  "@aboutLicenseMit": {},
+
+  "settingsLanguageChinese": "Chinese",
+  "@settingsLanguageChinese": {},
+
+  "gatewayConnectTitle": "Connect portable gateway",
+  "@gatewayConnectTitle": {},
+
+  "gatewayConnectAction": "Gateway",
+  "@gatewayConnectAction": {},
+
+  "gatewayConnectBody": "Phone uses Wi-Fi TCP. Choose Modbus TCP (MBAP) or RTU-over-TCP (raw frame with CRC). Enter the gateway IP and port. A TCP socket alone is not a verified Modbus reply.",
+  "@gatewayConnectBody": {},
+
+  "protocolTcpDetail": "Modbus TCP: MBAP header on the phone's TCP socket. No CRC.",
+  "@protocolTcpDetail": {},
+
+  "protocolRtuDetail": "RTU over TCP: raw RTU frame with CRC on the phone's TCP socket. Not the same as Modbus TCP.",
+  "@protocolRtuDetail": {},
+
+  "protocolGatewayWarning": "Not every RS485 gateway converts between these framings. Select the mode the gateway actually speaks.",
+  "@protocolGatewayWarning": {},
+
+  "rtuSecondMasterWarning": "Warning: joining an RTU bus that already has a master can corrupt traffic. Do not connect as a second master on an active bus.",
+  "@rtuSecondMasterWarning": {},
+
+  "serialWiringTitle": "RS485 wiring notes",
+  "@serialWiringTitle": {},
+
+  "serialWiringNote": "Baud, parity, stop bits and port are recorded only. This app cannot apply them to an unknown gateway.",
+  "@serialWiringNote": {},
+
+  "serialBaud": "Baud (note)",
+  "@serialBaud": {},
+
+  "serialParity": "Parity (note)",
+  "@serialParity": {},
+
+  "serialStopBits": "Stop bits (note)",
+  "@serialStopBits": {},
+
+  "serialPortLabel": "RS485 port label (note)",
+  "@serialPortLabel": {},
+
+  "serialParityNone": "None",
+  "@serialParityNone": {},
+
+  "serialParityEven": "Even",
+  "@serialParityEven": {},
+
+  "serialParityOdd": "Odd",
+  "@serialParityOdd": {},
+
+  "transportSectionTitle": "Phone link",
+  "@transportSectionTitle": {},
+
+  "transportWifi": "Wi-Fi TCP",
+  "@transportWifi": {},
+
+  "transportWifiDetail": "Implemented. The phone opens a TCP socket to the gateway.",
+  "@transportWifiDetail": {},
+
+  "transportUsb": "USB OTG RS485",
+  "@transportUsb": {},
+
+  "transportBluetooth": "Bluetooth",
+  "@transportBluetooth": {},
+
+  "transportUnavailable": "Not in this version. Nothing here opens that link.",
+  "@transportUnavailable": {},
+
+  "linkTcpOpen": "TCP open, Modbus not verified",
+  "@linkTcpOpen": {},
+
+  "scanBoundsNote": "Scanning is manual. It stays within 256 hosts, 4 ports and 4096 probes, and it does not start by itself. Type an IP if you already know the gateway.",
+  "@scanBoundsNote": {},
+
+  "scanRejected": "Scan not started. Narrow the subnet, ports or unit IDs, or enter the gateway address by hand.",
+  "@scanRejected": {},
+
+  "unitIdInvalid": "Unit ID must be 1–247. Unit ID 0 is broadcast and is not used.",
+  "@unitIdInvalid": {},
+
+  "writeDeniedTitle": "Write blocked",
+  "@writeDeniedTitle": {},
+
+  "writeDeniedDisabled": "Writes are off. Turn on Allow writes in Settings, then confirm each write.",
+  "@writeDeniedDisabled": {},
+
+  "writeDeniedBroadcast": "Unit ID 0 is the Modbus broadcast address. This app will not send it.",
+  "@writeDeniedBroadcast": {},
+
+  "writeConfirmEndpoint": "Endpoint",
+  "@writeConfirmEndpoint": {},
+
+  "writeConfirmUnit": "Unit ID",
+  "@writeConfirmUnit": {},
+
+  "writeConfirmFunction": "Function",
+  "@writeConfirmFunction": {},
+
+  "writeConfirmPdu": "PDU address (0-based)",
+  "@writeConfirmPdu": {},
+
+  "writeConfirmReference": "Reference label",
+  "@writeConfirmReference": {},
+
+  "writeConfirmOld": "Old value",
+  "@writeConfirmOld": {},
+
+  "writeConfirmOldUnknown": "Unknown — not read in this session",
+  "@writeConfirmOldUnknown": {},
+
+  "writeConfirmNew": "New value",
+  "@writeConfirmNew": {},
+
+  "demoDataBanner": "DEMONSTRATION DATA — not a live device response",
+  "@demoDataBanner": {},
+
+  "aboutFieldEdition": "Field edition for Android. Works offline. No account and no cloud service.",
+  "@aboutFieldEdition": {},
+
+  "aboutUpstream": "Based on OpenModScan Mobile by Alexandr Ananev, MIT License. Upstream: github.com/sanny32/OpenModScan-Mobile.",
+  "@aboutUpstream": {},
+
+  "aboutNoHardware": "This build has not been verified on physical RS485 or gateway hardware.",
+  "@aboutNoHardware": {},
+
+  "scaleTitle": "Engineering scale",
+  "@scaleTitle": {},
+
+  "scaleGain": "Gain",
+  "@scaleGain": {},
+
+  "scaleOffset": "Offset",
+  "@scaleOffset": {},
+
+  "scaleNote": "Display only: scaled = raw × gain + offset. The Modbus frame is not scaled. 1 and 0 leave the raw value unchanged.",
+  "@scaleNote": {}
 }

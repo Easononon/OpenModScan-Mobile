@@ -135,6 +135,9 @@ class _TrafficScreenState extends State<TrafficScreen> {
             ConnectionStatusChip(
               connected:
                   selected != null && widget.controller.isConnected(selected),
+              modbusVerified:
+                  selected != null &&
+                  widget.controller.isModbusVerified(selected),
             ),
           ],
         ),

@@ -21,6 +21,7 @@ void main() {
 
   setUp(() async {
     await resetAppTestState();
+    await AppSettings.instance.setWriteEnabled(true);
     device = DeviceInfo(
       id: 'device-1',
       name: 'PLC',

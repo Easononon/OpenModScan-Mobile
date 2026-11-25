@@ -5,10 +5,17 @@ class RegisterConfig {
   String typeName;
   String? comment;
 
+  /// Engineering scale applied only to the displayed number: `raw * scale + offset`.
+  /// Identity is 1 and 0. The Modbus PDU is never scaled.
+  double scale;
+  double offset;
+
   RegisterConfig({
     required this.address,
     this.typeName = 'UInt16',
     this.comment,
+    this.scale = 1,
+    this.offset = 0,
   });
 
   RegisterConfig copyWith({
@@ -16,23 +23,41 @@ class RegisterConfig {
     String? typeName,
     String? comment,
     bool clearComment = false,
+    double? scale,
+    double? offset,
   }) => RegisterConfig(
     address: address ?? this.address,
     typeName: typeName ?? this.typeName,
     comment: clearComment ? null : comment ?? this.comment,
+    scale: scale ?? this.scale,
+    offset: offset ?? this.offset,
   );
 
   Map<String, dynamic> toJson() => {
     'address': address,
     'typeName': typeName,
     if (comment != null) 'comment': comment,
+    if (scale != 1) 'scale': scale,
+    if (offset != 0) 'offset': offset,
   };
 
   factory RegisterConfig.fromJson(Map<String, dynamic> json) => RegisterConfig(
     address: json['address'] as int,
     typeName: json['typeName'] as String? ?? 'UInt16',
     comment: json['comment'] as String?,
+    scale: _finiteDouble(json['scale']) ?? 1,
+    offset: _finiteDouble(json['offset']) ?? 0,
   );
+}
+
+double? _finiteDouble(Object? value) {
+  final number = switch (value) {
+    int() => value.toDouble(),
+    double() => value,
+    _ => null,
+  };
+  if (number == null || number.isNaN || number.isInfinite) return null;
+  return number;
 }
 
 class StatusConfig {

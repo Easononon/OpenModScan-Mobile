@@ -41,6 +41,7 @@ class _StatusTab extends StatefulWidget {
     required bool value,
   })
   onValueWritten;
+  final DeviceInfo? device;
 
   const _StatusTab({
     required this.statusType,
@@ -67,6 +68,7 @@ class _StatusTab extends StatefulWidget {
     required this.onRead,
     required this.onEntryChanged,
     required this.onValueWritten,
+    required this.device,
   });
 
   @override
@@ -252,10 +254,13 @@ class _StatusTabState extends State<_StatusTab> {
       final reference = references[address];
       final runtime = widget.runtimeValues[(widget.statusType, address)];
       final value = runtime?.value ?? reference?.value ?? false;
+      final demonstration =
+          AppFlags.demoData && runtime == null && reference != null;
       return StatusEntry(
         address: address,
         displayAddress: _addressType.toReferenceDisplay(address),
         value: value,
+        demonstration: demonstration,
         previousValue: runtime?.previous ?? reference?.previousValue,
         comment: configByAddress[address]?.comment ?? reference?.comment ?? '',
         timestamp: runtime?.readAt == null
@@ -385,9 +390,24 @@ class _StatusTabState extends State<_StatusTab> {
         context: context,
         builder: (ctx) => AlertDialog(
           title: Text(context.l10n.writeCoilTitle),
-          content: Text(
-            context.l10n.writeCoilConfirm(entry.address, value ? 'ON' : 'OFF'),
-          ),
+          content: widget.device == null
+              ? Text(
+                  context.l10n.writeCoilConfirm(
+                    entry.address,
+                    value ? 'ON' : 'OFF',
+                  ),
+                )
+              : WriteConfirmBody(
+                  plan: WritePlan.coil(
+                    device: widget.device!,
+                    displayAddress: entry.address,
+                    addressBase: AppSettings.instance.addressBaseStart,
+                    newValue: value ? 'ON' : 'OFF',
+                    knownOldValue: entry.demonstration
+                        ? null
+                        : (entry.value ? 'ON' : 'OFF'),
+                  ),
+                ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),

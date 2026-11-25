@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:omodscan_mobile/features/devices/devices_controller.dart';
+import 'package:omodscan_mobile/field/write_guard.dart';
 import 'package:omodscan_mobile/models/app_settings.dart';
 import 'package:omodscan_mobile/models/device_info.dart';
 import 'package:omodscan_mobile/runtime/runtime_ports.dart';
@@ -18,6 +19,7 @@ void main() {
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     await AppSettings.instance.resetToDefaults();
+    await AppSettings.instance.setWriteEnabled(true);
     device = DeviceInfo(
       id: 'device-1',
       name: 'PLC',
@@ -127,7 +129,7 @@ void main() {
         registerOrder: 'MSRF',
         byteOrder: 'Direct',
       ),
-      throwsStateError,
+      throwsA(isA<WriteDenied>()),
     );
   });
 }

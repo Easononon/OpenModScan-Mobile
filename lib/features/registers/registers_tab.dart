@@ -41,6 +41,8 @@ class _RegistersTab extends StatefulWidget {
   onValueWritten;
   final Listenable valuesListenable;
   final RegisterRuntimeValue? Function(int address) liveValueAt;
+  final DeviceInfo? device;
+  final void Function(int address, double scale, double offset)? onScaleChanged;
 
   const _RegistersTab({
     required this.regType,
@@ -70,6 +72,8 @@ class _RegistersTab extends StatefulWidget {
     required this.onValueWritten,
     required this.valuesListenable,
     required this.liveValueAt,
+    required this.device,
+    required this.onScaleChanged,
   });
 
   @override
@@ -268,7 +272,11 @@ class _RegistersTabState extends State<_RegistersTab> {
       final runtime = widget.runtimeValues[addr];
       final typeName = config?.typeName ?? mock?.typeName ?? 'UInt16';
       final rawStr = runtime?.value ?? mock?.value ?? '0';
-      final valueState = !widget.isConnected
+      final demonstration =
+          AppFlags.demoData && runtime == null && mock != null;
+      final valueState = demonstration
+          ? RegisterValueState.demonstration
+          : !widget.isConnected
           ? RegisterValueState.unavailable
           : widget.valueState == RegisterValueState.exception
           ? RegisterValueState.exception
@@ -279,11 +287,19 @@ class _RegistersTabState extends State<_RegistersTab> {
         address: addr,
         displayAddress: addressType.toReferenceDisplay(addr),
         value: rawStr,
-        displayValue: computeDisplayValue(addr, typeName, rawInts),
+        displayValue: computeDisplayValue(
+          addr,
+          typeName,
+          rawInts,
+          scale: config?.scale ?? 1,
+          offset: config?.offset ?? 0,
+        ),
         previousValue: runtime?.previous ?? mock?.previousValue,
         valueState: valueState,
         typeName: typeName,
         comment: config?.comment ?? mock?.comment,
+        scale: config?.scale ?? 1,
+        offset: config?.offset ?? 0,
         timestamp: runtime?.readAt == null
             ? mock?.timestamp
             : _formatTimestamp(runtime!.readAt!),
@@ -423,6 +439,8 @@ class _RegistersTabState extends State<_RegistersTab> {
                   onValueWritten: widget.onValueWritten,
                   valuesListenable: widget.valuesListenable,
                   liveValueAt: widget.liveValueAt,
+                  device: widget.device,
+                  onScaleChanged: widget.onScaleChanged,
                 );
               },
             ),

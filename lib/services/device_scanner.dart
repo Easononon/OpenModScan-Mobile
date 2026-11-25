@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 
+import '../field/scan_bounds.dart';
 import '../models/device_info.dart';
 import '../runtime/runtime_ports.dart';
 import 'discovered_device_list.dart';
@@ -109,9 +110,43 @@ class DeviceScanner extends ChangeNotifier implements DeviceScannerPort {
     return cidrs.toList(growable: false);
   }
 
+  String? _rejection;
+
+  /// Set when a scan is refused because it is larger than [ScanBounds].
+  String? get scanRejection => _rejection;
+
   @override
   Future<void> startScan(DeviceScanRequest request) async {
     if (_state == ScannerStateView.scanning) return;
+
+    final estimatedHosts = scanHostsProvider == null
+        ? ScanBounds.hostCountFor(
+            cidr: request.subnetCidr,
+            prefix: request.subnetPrefix,
+          )
+        : 0;
+    final earlyViolation = scanHostsProvider == null
+        ? ScanBounds.violation(
+            hostCount: estimatedHosts,
+            portStart: request.portStart,
+            portEnd: request.portEnd,
+            unitStart: request.unitIdStart,
+            unitEnd: request.unitIdEnd,
+          )
+        : null;
+    if (earlyViolation != null) {
+      _rejection = earlyViolation;
+      _cancelled = true;
+      _scanned = 0;
+      _total = 0;
+      _scanCidr = request.subnetCidr;
+      _scanStartedAt = null;
+      _scanProtocol = request.protocol;
+      _state = ScannerStateView.idle;
+      notifyListeners();
+      return;
+    }
+    _rejection = null;
 
     final generation = ++_scanGeneration;
     _cancelled = false;
@@ -127,6 +162,22 @@ class DeviceScanner extends ChangeNotifier implements DeviceScannerPort {
     final hosts = await _hostsFor(request);
     final ports = request.ports.toList(growable: false);
     final unitIds = request.unitIds.toList(growable: false);
+    final actualViolation = ScanBounds.violation(
+      hostCount: hosts.length,
+      portStart: request.portStart,
+      portEnd: request.portEnd,
+      unitStart: request.unitIdStart,
+      unitEnd: request.unitIdEnd,
+    );
+    if (actualViolation != null) {
+      _rejection = actualViolation;
+      _cancelled = true;
+      _scanned = 0;
+      _total = 0;
+      _state = ScannerStateView.idle;
+      notifyListeners();
+      return;
+    }
     _total = hosts.length * ports.length * unitIds.length;
     notifyListeners();
 

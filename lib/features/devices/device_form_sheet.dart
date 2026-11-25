@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../field/field_transport.dart';
 import '../../l10n/l10n.dart';
 import '../../models/app_settings.dart';
 import '../../models/device_info.dart';
@@ -42,7 +43,12 @@ class _DeviceFormSheetState extends State<DeviceFormSheet> {
   late final TextEditingController _timeoutCtrl;
   late final TextEditingController _reconnectCtrl;
   late final TextEditingController _notesCtrl;
+  late final TextEditingController _baudCtrl;
+  late final TextEditingController _serialPortCtrl;
+  late String _parity;
+  late int _stopBits;
   String? _nameError;
+  String? _unitError;
 
   bool get _isEdit => widget.initial != null && !widget.addMode;
 
@@ -69,6 +75,13 @@ class _DeviceFormSheetState extends State<DeviceFormSheet> {
       text: (d?.reconnectDelay ?? defaults.reconnectDelay).toString(),
     );
     _notesCtrl = TextEditingController(text: d?.notes ?? '');
+    final wiring = d?.serialWiring ?? const SerialWiringNote();
+    _baudCtrl = TextEditingController(
+      text: wiring.baudRate?.toString() ?? '',
+    );
+    _serialPortCtrl = TextEditingController(text: wiring.portLabel);
+    _parity = wiring.parity;
+    _stopBits = wiring.stopBits;
   }
 
   @override
@@ -80,7 +93,19 @@ class _DeviceFormSheetState extends State<DeviceFormSheet> {
     _timeoutCtrl.dispose();
     _reconnectCtrl.dispose();
     _notesCtrl.dispose();
+    _baudCtrl.dispose();
+    _serialPortCtrl.dispose();
     super.dispose();
+  }
+
+  SerialWiringNote _serialWiring() {
+    final baud = int.tryParse(_baudCtrl.text.trim());
+    return SerialWiringNote(
+      baudRate: baud != null && baud >= 300 && baud <= 921600 ? baud : null,
+      parity: _parity,
+      stopBits: _stopBits,
+      portLabel: _serialPortCtrl.text.trim(),
+    );
   }
 
   void _submit({bool connectAfterSave = false}) {
@@ -92,6 +117,11 @@ class _DeviceFormSheetState extends State<DeviceFormSheet> {
     }
     if (widget.existingNames.contains(name)) {
       setState(() => _nameError = l10n.nameAlreadyExists);
+      return;
+    }
+    final unitId = int.tryParse(_unitCtrl.text);
+    if (unitId == null || unitId < 1 || unitId > 247) {
+      setState(() => _unitError = l10n.unitIdInvalid);
       return;
     }
 
@@ -111,11 +141,13 @@ class _DeviceFormSheetState extends State<DeviceFormSheet> {
       protocol: _connType == 0
           ? ProtocolType.modbusTcp
           : ProtocolType.modbusRtuIp,
-      unitId: int.tryParse(_unitCtrl.text) ?? base.unitId,
+      unitId: unitId,
       timeout: int.tryParse(_timeoutCtrl.text) ?? base.timeout,
       reconnectDelay: int.tryParse(_reconnectCtrl.text) ?? base.reconnectDelay,
       notes: _notesCtrl.text,
       markerColor: _markerColor,
+      serialWiring: _serialWiring(),
+      transport: FieldTransport.wifiTcp,
     );
     Navigator.pop(
       context,
@@ -213,6 +245,28 @@ class _DeviceFormSheetState extends State<DeviceFormSheet> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _connType == 0
+                        ? l10n.protocolTcpDetail
+                        : l10n.protocolRtuDetail,
+                    style: tt.bodyMedium?.copyWith(color: cs.onSurface),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    l10n.protocolGatewayWarning,
+                    style: tt.bodySmall?.copyWith(color: cs.onSurface),
+                  ),
+                  if (_connType == 1) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      l10n.rtuSecondMasterWarning,
+                      style: tt.bodyMedium?.copyWith(
+                        color: cs.error,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 20),
                   _label(context, l10n.labelName),
                   const SizedBox(height: 6),
@@ -278,7 +332,90 @@ class _DeviceFormSheetState extends State<DeviceFormSheet> {
                     _unitCtrl,
                     label: l10n.labelUnitIdField,
                     type: TextInputType.number,
+                    errorText: _unitError,
+                    onChanged: (_) {
+                      if (_unitError != null) setState(() => _unitError = null);
+                    },
                   ),
+                  const SizedBox(height: 16),
+                  _label(context, l10n.serialWiringTitle),
+                  const SizedBox(height: 4),
+                  Text(
+                    l10n.serialWiringNote,
+                    style: tt.bodySmall?.copyWith(color: cs.onSurface),
+                  ),
+                  const SizedBox(height: 8),
+                  _field(
+                    _baudCtrl,
+                    label: l10n.serialBaud,
+                    type: TextInputType.number,
+                  ),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    initialValue: _parity,
+                    decoration: InputDecoration(labelText: l10n.serialParity),
+                    items: [
+                      DropdownMenuItem(
+                        value: 'none',
+                        child: Text(l10n.serialParityNone),
+                      ),
+                      DropdownMenuItem(
+                        value: 'even',
+                        child: Text(l10n.serialParityEven),
+                      ),
+                      DropdownMenuItem(
+                        value: 'odd',
+                        child: Text(l10n.serialParityOdd),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      if (value == null) return;
+                      setState(() => _parity = value);
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<int>(
+                    initialValue: _stopBits,
+                    decoration: InputDecoration(labelText: l10n.serialStopBits),
+                    items: const [
+                      DropdownMenuItem(value: 1, child: Text('1')),
+                      DropdownMenuItem(value: 2, child: Text('2')),
+                    ],
+                    onChanged: (value) {
+                      if (value == null) return;
+                      setState(() => _stopBits = value);
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  _field(_serialPortCtrl, label: l10n.serialPortLabel),
+                  const SizedBox(height: 16),
+                  _label(context, l10n.transportSectionTitle),
+                  const SizedBox(height: 8),
+                  for (final transport in FieldTransport.displayed)
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      enabled: transport.available,
+                      leading: Icon(
+                        transport.available
+                            ? Icons.wifi
+                            : Icons.portable_wifi_off,
+                        color: transport.available
+                            ? cs.primary
+                            : cs.onSurfaceVariant,
+                      ),
+                      title: Text(
+                        switch (transport) {
+                          FieldTransport.wifiTcp => l10n.transportWifi,
+                          FieldTransport.usbOtgRs485 => l10n.transportUsb,
+                          FieldTransport.bluetooth => l10n.transportBluetooth,
+                        },
+                      ),
+                      subtitle: Text(
+                        transport.available
+                            ? l10n.transportWifiDetail
+                            : l10n.transportUnavailable,
+                      ),
+                    ),
                   const SizedBox(height: 16),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.end,

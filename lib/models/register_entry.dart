@@ -26,7 +26,7 @@ int registerWordCount(String typeName) {
   }
 }
 
-enum RegisterValueState { received, unavailable, exception }
+enum RegisterValueState { received, unavailable, exception, demonstration }
 
 class RegisterEntry {
   final int address;
@@ -41,6 +41,8 @@ class RegisterEntry {
   final String? date;
   final Map<int, int> rawWords;
   final Map<int, int> previousRawWords;
+  final double scale;
+  final double offset;
 
   const RegisterEntry({
     required this.address,
@@ -55,6 +57,8 @@ class RegisterEntry {
     this.date,
     this.rawWords = const {},
     this.previousRawWords = const {},
+    this.scale = 1,
+    this.offset = 0,
   });
 
   RegisterEntry copyWith({
@@ -70,6 +74,8 @@ class RegisterEntry {
     String? date,
     Map<int, int>? rawWords,
     Map<int, int>? previousRawWords,
+    double? scale,
+    double? offset,
   }) => RegisterEntry(
     address: address ?? this.address,
     displayAddress: displayAddress ?? this.displayAddress,
@@ -83,5 +89,7 @@ class RegisterEntry {
     date: date ?? this.date,
     rawWords: rawWords ?? this.rawWords,
     previousRawWords: previousRawWords ?? this.previousRawWords,
+    scale: scale ?? this.scale,
+    offset: offset ?? this.offset,
   );
 }

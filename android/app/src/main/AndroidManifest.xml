@@ -2,7 +2,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:label="Open ModScan"
+        android:label="现场Modbus"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
