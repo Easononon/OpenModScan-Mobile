@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../app_flags.dart';
 import '../features/devices/device_screen.dart';
 import '../features/devices/device_write_screen.dart';
 import '../features/devices/devices_controller.dart';
@@ -149,6 +150,31 @@ GoRouter createAppRouter({
   );
 }
 
+class _DemoDataBanner extends StatelessWidget {
+  const _DemoDataBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return Material(
+      color: const Color(0xFF8A5A00),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Text(
+            l10n.demoDataBanner,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _ShellScaffold extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
   final ValueNotifier<String?> registersReturnDeviceId;
@@ -193,7 +219,12 @@ class _ShellScaffold extends StatelessWidget {
         if (!didPop) _handlePop();
       },
       child: Scaffold(
-        body: navigationShell,
+        body: Column(
+          children: [
+            if (AppFlags.demoData) const _DemoDataBanner(),
+            Expanded(child: navigationShell),
+          ],
+        ),
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: navigationShell.currentIndex,
           onTap: _onTap,

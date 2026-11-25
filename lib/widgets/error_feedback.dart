@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../field/write_guard.dart';
 import '../l10n/l10n.dart';
 import '../services/modbus_client.dart';
 
@@ -36,6 +37,15 @@ ErrorFeedbackMessage errorFeedbackMessage(BuildContext context, Object error) {
     return ErrorFeedbackMessage(
       title: l10n.errorTimeoutTitle,
       body: l10n.errorTimeoutBody,
+    );
+  }
+
+  if (error is WriteDenied) {
+    return ErrorFeedbackMessage(
+      title: l10n.writeDeniedTitle,
+      body: error.reason == WriteDenyReason.broadcastUnit
+          ? l10n.writeDeniedBroadcast
+          : l10n.writeDeniedDisabled,
     );
   }
 

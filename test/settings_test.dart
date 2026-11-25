@@ -152,8 +152,8 @@ void main() {
 
     final prefs = await SharedPreferences.getInstance();
     expect(prefs.getBool('scanClearOnStart'), isFalse);
-    expect(prefs.getBool('writeEnabled'), isFalse);
-    expect(prefs.getBool('confirmBeforeWrite'), isTrue);
+    expect(prefs.getBool('writeEnabled'), isTrue);
+    expect(prefs.getBool('confirmBeforeWrite'), isFalse);
     expect(prefs.getBool('showLastValues'), isFalse);
     expect(prefs.getBool('showTypeBadges'), isTrue);
     expect(prefs.getBool('saveLogToFile'), isTrue);
@@ -165,7 +165,7 @@ void main() {
   ) async {
     await AppSettings.instance.setAddressBase('1-based');
     await AppSettings.instance.setScanSubnetPrefix(20);
-    await AppSettings.instance.setWriteEnabled(false);
+    await AppSettings.instance.setWriteEnabled(true);
     await AppSettings.instance.setSaveLogToFile(true);
 
     await _pumpSettings(tester);
@@ -176,11 +176,11 @@ void main() {
     final prefs = await SharedPreferences.getInstance();
     expect(AppSettings.instance.addressBase, '0-based');
     expect(AppSettings.instance.scanSubnetPrefix, 24);
-    expect(AppSettings.instance.writeEnabled, isTrue);
+    expect(AppSettings.instance.writeEnabled, isFalse);
     expect(AppSettings.instance.saveLogToFile, isFalse);
     expect(prefs.getString('addressBase'), '0-based');
     expect(prefs.getInt('scanSubnetPrefix'), 24);
-    expect(prefs.getBool('writeEnabled'), isTrue);
+    expect(prefs.getBool('writeEnabled'), isFalse);
     expect(prefs.getBool('saveLogToFile'), isFalse);
   });
 }

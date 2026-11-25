@@ -271,6 +271,16 @@ class _DevicesScreenState extends State<DevicesScreen> {
                     Expanded(
                       child: Text(l10n.navDevices, style: tt.headlineMedium),
                     ),
+                    FilledButton.icon(
+                      key: const ValueKey('connect-portable-gateway'),
+                      onPressed: _openConnect,
+                      icon: const Icon(Icons.settings_input_antenna),
+                      label: Text(l10n.gatewayConnectAction),
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size(48, 48),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                    ),
                     IconButton(
                       key: AppTestKeys.deviceAddButton,
                       icon: const Icon(Icons.add),

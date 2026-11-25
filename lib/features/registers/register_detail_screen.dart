@@ -4,6 +4,7 @@ import '../../models/app_settings.dart';
 import '../../models/register_entry.dart';
 import '../../theme/app_dimens.dart';
 import '../../theme/app_theme.dart';
+import '../../field/address_mapping.dart';
 import '../../utils/modbus_format.dart';
 import '../../utils/value_input.dart';
 import '../../widgets/app_test_keys.dart';
@@ -53,6 +54,7 @@ class RegisterDetailScreen extends StatefulWidget {
   onValueWritten;
   final Listenable? valuesListenable;
   final RegisterRuntimeValue? Function(int address)? liveValueAt;
+  final void Function(double scale, double offset)? onScaleChanged;
 
   const RegisterDetailScreen({
     super.key,
@@ -62,6 +64,7 @@ class RegisterDetailScreen extends StatefulWidget {
     this.onValueWritten,
     this.valuesListenable,
     this.liveValueAt,
+    this.onScaleChanged,
   });
 
   @override
@@ -131,23 +134,29 @@ class _RegisterDetailScreenState extends State<RegisterDetailScreen> {
   }
 
   String _displayPreviousValue(String raw) {
-    if (_entry.previousRawWords.isNotEmpty) {
-      return computeDisplayValue(
-        _entry.address,
-        _selectedType,
-        _entry.previousRawWords,
-        registerOrder: _registerOrder,
-        byteOrder: _byteOrder,
-      );
-    }
-    final rawInt = int.tryParse(raw);
-    if (rawInt == null) return raw;
-    return computeDisplayValue(
-      _entry.address,
-      _selectedType,
-      {_entry.address: rawInt},
-      registerOrder: _registerOrder,
-      byteOrder: _byteOrder,
+    final formatted = _entry.previousRawWords.isNotEmpty
+        ? computeDisplayValue(
+            _entry.address,
+            _selectedType,
+            _entry.previousRawWords,
+            registerOrder: _registerOrder,
+            byteOrder: _byteOrder,
+          )
+        : () {
+            final rawInt = int.tryParse(raw);
+            if (rawInt == null) return raw;
+            return computeDisplayValue(
+              _entry.address,
+              _selectedType,
+              {_entry.address: rawInt},
+              registerOrder: _registerOrder,
+              byteOrder: _byteOrder,
+            );
+          }();
+    return applyEngineeringScale(
+      formatted,
+      scale: _entry.scale,
+      offset: _entry.offset,
     );
   }
 
@@ -195,21 +204,28 @@ class _RegisterDetailScreenState extends State<RegisterDetailScreen> {
     return [for (final type in kRegisterTypes) _Interpretation(type, v(type))];
   }
 
-  String _displayValueForType(String type) {
-    if (!_hasRawWords) return _entry.displayValue ?? _entry.value;
-    for (final interp in _buildInterpretations()) {
-      if (interp.typeName == type) return interp.value;
-    }
-    return _entry.value;
+  String _rawTypedValue(String type) {
+    if (!_hasRawWords) return _entry.value;
+    return computeDisplayValue(
+      _entry.address,
+      type,
+      _entry.rawWords,
+      registerOrder: _registerOrder,
+      byteOrder: _byteOrder,
+    );
   }
+
+  String _engineeringValue(String type) => applyEngineeringScale(
+    _rawTypedValue(type),
+    scale: _entry.scale,
+    offset: _entry.offset,
+  );
 
   Future<void> _showWriteDialog() async {
     final l10n = context.l10n;
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
-    final ctrl = TextEditingController(
-      text: _displayValueForType(_selectedType),
-    );
+    final ctrl = TextEditingController(text: _rawTypedValue(_selectedType));
     String? error;
     var writing = false;
 
@@ -395,7 +411,7 @@ class _RegisterDetailScreenState extends State<RegisterDetailScreen> {
     final tt = Theme.of(context).textTheme;
     final appColors = Theme.of(context).extension<AppColors>()!;
     final entry = _entry;
-    final currentValue = _displayValueForType(_selectedType);
+    final currentValue = _engineeringValue(_selectedType);
     final valueColor = _valueColor(context, entry.valueState);
     final showPreviousValue =
         entry.previousValue != null &&
@@ -561,6 +577,16 @@ class _RegisterDetailScreenState extends State<RegisterDetailScreen> {
               comment: _commentCtrl.text.isEmpty ? null : _commentCtrl.text,
               onChanged: _saveComment,
             ),
+            if (widget.entry.valueState == RegisterValueState.demonstration) ...[
+              const SizedBox(height: 12),
+              Text(
+                l10n.demoDataBanner,
+                style: tt.bodyMedium?.copyWith(
+                  color: appColors.warningColor,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
             if (_hasRawWords) ...[
               const SizedBox(height: 18),
               _InterpretationsHeader(
@@ -590,6 +616,21 @@ class _RegisterDetailScreenState extends State<RegisterDetailScreen> {
                     });
                   }(),
                 ),
+              ),
+            ],
+            if (widget.onScaleChanged != null) ...[
+              const SizedBox(height: 18),
+              SectionHeader(l10n.scaleTitle),
+              const SizedBox(height: 7),
+              _ScaleCard(
+                scale: _entry.scale,
+                offset: _entry.offset,
+                onChanged: (scale, offset) {
+                  setState(() {
+                    _entry = _entry.copyWith(scale: scale, offset: offset);
+                  });
+                  widget.onScaleChanged!(scale, offset);
+                },
               ),
             ],
           ],
@@ -624,6 +665,7 @@ Color _valueColor(BuildContext context, RegisterValueState state) {
     RegisterValueState.received => appColors.valueColor,
     RegisterValueState.unavailable => appColors.unavailableValueColor,
     RegisterValueState.exception => appColors.exceptionValueColor,
+    RegisterValueState.demonstration => appColors.warningColor,
   };
 }
 
@@ -958,6 +1000,88 @@ class _CommentSheetState extends State<_CommentSheet> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _ScaleCard extends StatefulWidget {
+  final double scale;
+  final double offset;
+  final void Function(double scale, double offset) onChanged;
+
+  const _ScaleCard({
+    required this.scale,
+    required this.offset,
+    required this.onChanged,
+  });
+
+  @override
+  State<_ScaleCard> createState() => _ScaleCardState();
+}
+
+class _ScaleCardState extends State<_ScaleCard> {
+  late final TextEditingController _scaleCtrl;
+  late final TextEditingController _offsetCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _scaleCtrl = TextEditingController(text: widget.scale.toString());
+    _offsetCtrl = TextEditingController(text: widget.offset.toString());
+  }
+
+  @override
+  void dispose() {
+    _scaleCtrl.dispose();
+    _offsetCtrl.dispose();
+    super.dispose();
+  }
+
+  void _commit() {
+    final scale = double.tryParse(_scaleCtrl.text.trim());
+    final offset = double.tryParse(_offsetCtrl.text.trim());
+    if (scale == null ||
+        offset == null ||
+        !scale.isFinite ||
+        !offset.isFinite) {
+      return;
+    }
+    widget.onChanged(scale, offset);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(l10n.scaleNote),
+        const SizedBox(height: 8),
+        TextField(
+          controller: _scaleCtrl,
+          keyboardType: const TextInputType.numberWithOptions(
+            signed: true,
+            decimal: true,
+          ),
+          decoration: InputDecoration(labelText: l10n.scaleGain),
+          onSubmitted: (_) => _commit(),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: _offsetCtrl,
+          keyboardType: const TextInputType.numberWithOptions(
+            signed: true,
+            decimal: true,
+          ),
+          decoration: InputDecoration(labelText: l10n.scaleOffset),
+          onSubmitted: (_) => _commit(),
+        ),
+        const SizedBox(height: 8),
+        Align(
+          alignment: Alignment.centerRight,
+          child: FilledButton(onPressed: _commit, child: Text(l10n.save)),
+        ),
+      ],
     );
   }
 }

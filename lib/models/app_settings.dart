@@ -51,7 +51,7 @@ class AppSettings {
   static const addressBases = ['0-based', '1-based'];
   static const readFailureAttemptOptions = [1, 2, 3, 5, 10];
   static const themeOptions = ['System', 'Light', 'Dark'];
-  static const languageOptions = ['System', 'English', 'Russian'];
+  static const languageOptions = ['System', 'Chinese', 'English', 'Russian'];
 
   ProtocolType connectionType = ProtocolType.modbusTcp;
   int timeout = 1000;
@@ -62,8 +62,8 @@ class AppSettings {
   String addressBase = addressBases.first;
   String registerOrder = registerOrders.first;
   String byteOrder = byteOrders.first;
-  bool writeEnabled = true;
-  bool confirmBeforeWrite = false;
+  bool writeEnabled = false;
+  bool confirmBeforeWrite = true;
   bool saveLogToFile = false;
   bool clearLogOnDisconnect = false;
   int maxLogEntries = 100;
@@ -113,8 +113,8 @@ class AppSettings {
     _setAddressBaseValue(_store.getString(_addressBaseKey));
     registerOrder = _store.getString(_registerOrderKey) ?? registerOrders.first;
     byteOrder = _store.getString(_byteOrderKey) ?? byteOrders.first;
-    writeEnabled = _store.getBool(_writeEnabledKey) ?? true;
-    confirmBeforeWrite = _store.getBool(_confirmBeforeWriteKey) ?? false;
+    writeEnabled = _store.getBool(_writeEnabledKey) ?? false;
+    confirmBeforeWrite = _store.getBool(_confirmBeforeWriteKey) ?? true;
     showLastValuesNotifier.value = _store.getBool(_showLastValuesKey) ?? true;
     showTypeBadgesNotifier.value = _store.getBool(_showTypeBadgesKey) ?? false;
     saveLogToFile = _store.getBool(_saveLogToFileKey) ?? false;
@@ -323,8 +323,8 @@ class AppSettings {
     _setAddressBaseValue(addressBases.first);
     registerOrder = registerOrders.first;
     byteOrder = byteOrders.first;
-    writeEnabled = true;
-    confirmBeforeWrite = false;
+    writeEnabled = false;
+    confirmBeforeWrite = true;
     showLastValues = true;
     showTypeBadges = false;
     saveLogToFile = false;
@@ -559,6 +559,9 @@ class AppSettings {
       case 'ru':
       case 'Russian':
         return const Locale('ru');
+      case 'zh':
+      case 'Chinese':
+        return const Locale('zh');
       case 'system':
       case 'System':
       default:
@@ -572,6 +575,8 @@ class AppSettings {
         return 'English';
       case 'ru':
         return 'Russian';
+      case 'zh':
+        return 'Chinese';
       default:
         return 'System';
     }

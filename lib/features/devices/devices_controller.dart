@@ -1,11 +1,14 @@
 import 'package:flutter/foundation.dart';
 
+import '../../field/scan_bounds.dart';
+import '../../field/write_guard.dart';
 import '../../models/app_settings.dart';
 import '../../models/device_info.dart';
 import '../../models/discovered_device.dart';
 import '../../models/register_address_type.dart';
 import '../../models/register_list.dart';
 import '../../runtime/runtime_ports.dart';
+import '../../services/connection_manager.dart';
 import '../../services/device_repository.dart';
 import '../../utils/modbus_format.dart';
 
@@ -41,6 +44,7 @@ class DevicesController extends ChangeNotifier {
   final AppSettings _settings;
 
   String _search = '';
+  String? _scanRejection;
 
   DevicesController(
     this._repository,
@@ -84,9 +88,14 @@ class DevicesController extends ChangeNotifier {
 
   ProtocolType? get scannerProtocol => _scanner.scanProtocol;
 
+  String? get scanRejection => _scanRejection;
+
   DeviceInfo? deviceById(String id) => _repository.findById(id);
 
   bool isConnected(DeviceInfo device) => _connectionRuntime.isConnected(device);
+
+  bool isModbusVerified(DeviceInfo device) =>
+      runtimeModbusVerified(_connectionRuntime, device);
 
   Future<void> toggleConnection(DeviceInfo device) async {
     if (isConnected(device)) {
@@ -154,9 +163,10 @@ class DevicesController extends ChangeNotifier {
     required String registerOrder,
     required String byteOrder,
   }) async {
-    if (!_settings.writeEnabled) {
-      throw StateError('Writes are disabled.');
-    }
+    enforceWriteAllowed(
+      writeEnabled: _settings.writeEnabled,
+      unitId: device.unitId,
+    );
     if (!_connectionRuntime.isConnected(device)) {
       throw StateError('${device.name} is not connected.');
     }
@@ -215,9 +225,10 @@ class DevicesController extends ChangeNotifier {
     required int address,
     required bool value,
   }) async {
-    if (!_settings.writeEnabled) {
-      throw StateError('Writes are disabled.');
-    }
+    enforceWriteAllowed(
+      writeEnabled: _settings.writeEnabled,
+      unitId: device.unitId,
+    );
     if (!_connectionRuntime.isConnected(device)) {
       throw StateError('${device.name} is not connected.');
     }
@@ -264,6 +275,22 @@ class DevicesController extends ChangeNotifier {
       _repository.removeRegisterList(deviceId, listId);
 
   Future<void> startScan() {
+    final violation = ScanBounds.violation(
+      hostCount: ScanBounds.hostCountFor(
+        cidr: _settings.scanSubnetCidr,
+        prefix: _settings.scanSubnetPrefix,
+      ),
+      portStart: _settings.scanPortStart,
+      portEnd: _settings.scanPortEnd,
+      unitStart: _settings.scanUnitIdStart,
+      unitEnd: _settings.scanUnitIdEnd,
+    );
+    if (violation != null) {
+      _scanRejection = violation;
+      notifyListeners();
+      return Future.value();
+    }
+    _scanRejection = null;
     if (_settings.scanClearOnStart) {
       _scanner.clearResults();
     }

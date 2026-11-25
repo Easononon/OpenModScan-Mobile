@@ -5,6 +5,7 @@ import '../../models/device_info.dart';
 import '../../models/log_entry.dart';
 import '../../navigation/navigation_targets.dart';
 import '../../runtime/runtime_ports.dart';
+import '../../services/connection_manager.dart';
 import '../../services/device_repository.dart';
 
 enum TrafficFilter { all, tx, rx, errors }
@@ -44,6 +45,9 @@ class TrafficController extends ChangeNotifier {
   bool get clearOnDisconnect => _clearOnDisconnect;
 
   bool isConnected(DeviceInfo device) => _connectionRuntime.isConnected(device);
+
+  bool isModbusVerified(DeviceInfo device) =>
+      runtimeModbusVerified(_connectionRuntime, device);
 
   Future<void> toggleConnection(DeviceInfo device) async {
     if (_connectionRuntime.isConnected(device)) {

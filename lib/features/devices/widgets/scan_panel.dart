@@ -287,7 +287,25 @@ class _ScanSheetState extends State<ScanSheet> {
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                  child: _ScanActionButton(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        l10n.scanBoundsNote,
+                        style: tt.bodySmall?.copyWith(color: cs.onSurface),
+                      ),
+                      if (controller.scanRejection != null) ...[
+                        const SizedBox(height: 6),
+                        Text(
+                          l10n.scanRejected,
+                          style: tt.bodyMedium?.copyWith(
+                            color: cs.error,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 8),
+                      _ScanActionButton(
                     icon: controller.scannerState == ScannerStateView.scanning
                         ? Icons.stop_circle_outlined
                         : Icons.sensors,
@@ -301,6 +319,8 @@ class _ScanSheetState extends State<ScanSheet> {
                     color: cs.primary,
                     filled:
                         controller.scannerState != ScannerStateView.scanning,
+                      ),
+                    ],
                   ),
                 ),
               ],

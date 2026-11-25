@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import '../field/address_mapping.dart';
 import '../models/app_settings.dart';
 import '../models/register_entry.dart';
 
@@ -32,6 +33,8 @@ String computeDisplayValue(
   Map<int, int> rawValues, {
   String? registerOrder,
   String? byteOrder,
+  double scale = 1,
+  double offset = 0,
 }) {
   final regOrder = registerOrder ?? AppSettings.instance.registerOrder;
   final byteOrd = byteOrder ?? AppSettings.instance.byteOrder;
@@ -41,67 +44,71 @@ String computeDisplayValue(
 
   int r(int addr) => applyByteSwap(rawValues[addr] ?? 0);
 
-  switch (typeName) {
-    case 'UInt16':
-      return r(address).toString();
-
-    case 'Int16':
-      {
-        final v = r(address);
-        return (v > 32767 ? v - 65536 : v).toString();
+  final formatted = switch (typeName) {
+    'UInt16' => r(address).toString(),
+    'Int16' => () {
+      final v = r(address);
+      return (v > 32767 ? v - 65536 : v).toString();
+    }(),
+    'Hex' =>
+      '0x${r(address).toRadixString(16).toUpperCase().padLeft(4, '0')}',
+    'Binary' => () {
+      final bin = r(address).toRadixString(2).padLeft(16, '0');
+      return '${bin.substring(0, 4)} ${bin.substring(4, 8)} '
+          '${bin.substring(8, 12)} ${bin.substring(12)}';
+    }(),
+    'UInt32' || 'Int32' || 'Float32' => () {
+      final hi = regOrder == 'MSRF' ? r(address) : r(address + 1);
+      final lo = regOrder == 'MSRF' ? r(address + 1) : r(address);
+      if (typeName == 'Float32') {
+        final bd = ByteData(4);
+        bd.setUint16(0, hi, Endian.big);
+        bd.setUint16(2, lo, Endian.big);
+        return formatFloat(bd.getFloat32(0, Endian.big));
       }
-
-    case 'Hex':
-      return '0x${r(address).toRadixString(16).toUpperCase().padLeft(4, '0')}';
-
-    case 'Binary':
-      {
-        final bin = r(address).toRadixString(2).padLeft(16, '0');
-        return '${bin.substring(0, 4)} ${bin.substring(4, 8)} '
-            '${bin.substring(8, 12)} ${bin.substring(12)}';
+      final combined = (hi << 16) | lo;
+      if (typeName == 'UInt32') return combined.toString();
+      return (combined > 0x7FFFFFFF ? combined - 0x100000000 : combined)
+          .toString();
+    }(),
+    'UInt64' || 'Int64' || 'Float64' => () {
+      final regs = List.generate(4, (i) => r(address + i));
+      final ordered = regOrder == 'MSRF' ? regs : regs.reversed.toList();
+      final bd = ByteData(8);
+      for (var i = 0; i < 4; i++) {
+        bd.setUint16(i * 2, ordered[i], Endian.big);
       }
-
-    case 'UInt32':
-    case 'Int32':
-    case 'Float32':
-      {
-        final hi = regOrder == 'MSRF' ? r(address) : r(address + 1);
-        final lo = regOrder == 'MSRF' ? r(address + 1) : r(address);
-        if (typeName == 'Float32') {
-          final bd = ByteData(4);
-          bd.setUint16(0, hi, Endian.big);
-          bd.setUint16(2, lo, Endian.big);
-          return formatFloat(bd.getFloat32(0, Endian.big));
-        }
-        final combined = (hi << 16) | lo;
-        if (typeName == 'UInt32') return combined.toString();
-        return (combined > 0x7FFFFFFF ? combined - 0x100000000 : combined)
-            .toString();
+      if (typeName == 'Float64') {
+        return formatFloat(bd.getFloat64(0, Endian.big));
       }
+      final high = bd.getUint32(0, Endian.big);
+      final low = bd.getUint32(4, Endian.big);
+      final val = (BigInt.from(high) << 32) | BigInt.from(low);
+      if (typeName == 'UInt64') return val.toString();
+      return val.toSigned(64).toString();
+    }(),
+    _ => (rawValues[address] ?? 0).toString(),
+  };
+  return applyEngineeringScale(formatted, scale: scale, offset: offset);
+}
 
-    case 'UInt64':
-    case 'Int64':
-    case 'Float64':
-      {
-        final regs = List.generate(4, (i) => r(address + i));
-        final ordered = regOrder == 'MSRF' ? regs : regs.reversed.toList();
-        final bd = ByteData(8);
-        for (var i = 0; i < 4; i++) {
-          bd.setUint16(i * 2, ordered[i], Endian.big);
-        }
-        if (typeName == 'Float64') {
-          return formatFloat(bd.getFloat64(0, Endian.big));
-        }
-        final high = bd.getUint32(0, Endian.big);
-        final low = bd.getUint32(4, Endian.big);
-        final val = (BigInt.from(high) << 32) | BigInt.from(low);
-        if (typeName == 'UInt64') return val.toString();
-        return val.toSigned(64).toString();
-      }
-
-    default:
-      return (rawValues[address] ?? 0).toString();
-  }
+/// Typed register text with scale and offset left at identity.
+///
+/// This is the string a write encodes. [RegisterEntry.displayValue] may already
+/// be an engineering-unit reading and must not be sent as the raw value.
+String rawTypedRegisterValue(
+  RegisterEntry entry, {
+  String? registerOrder,
+  String? byteOrder,
+}) {
+  if (entry.rawWords.isEmpty) return entry.value;
+  return computeDisplayValue(
+    entry.address,
+    entry.typeName,
+    entry.rawWords,
+    registerOrder: registerOrder,
+    byteOrder: byteOrder,
+  );
 }
 
 /// Encodes a typed user value into raw uint16 words in address order.

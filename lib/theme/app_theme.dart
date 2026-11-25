@@ -219,7 +219,7 @@ class AppTheme {
       surface: Color(0xFF1E1E1E),
       surfaceContainer: Color(0xFF1A1A1A),
       surfaceContainerHighest: Color(0xFF252525),
-      onSurfaceVariant: Colors.grey,
+      onSurfaceVariant: Color(0xFFD0D0D0),
       outline: Color(0xFF3A3A3A),
     ),
     cardTheme: CardThemeData(
@@ -241,7 +241,7 @@ class AppTheme {
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: Color(0xFF1E1E1E),
       selectedItemColor: _primary,
-      unselectedItemColor: Colors.grey,
+      unselectedItemColor: Color(0xFFBDBDBD),
       type: BottomNavigationBarType.fixed,
     ),
     tabBarTheme: const TabBarThemeData(
@@ -276,7 +276,7 @@ class AppTheme {
       surface: Colors.white,
       surfaceContainer: Color(0xFFEAEAF0),
       surfaceContainerHighest: Color(0xFFF0F0F5),
-      onSurfaceVariant: Color(0xFF757575),
+      onSurfaceVariant: Color(0xFF333333),
       outline: Color(0xFFE0E0E0),
     ),
     cardTheme: CardThemeData(
@@ -304,7 +304,7 @@ class AppTheme {
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: Colors.white,
       selectedItemColor: _primary,
-      unselectedItemColor: Color(0xFF757575),
+      unselectedItemColor: Color(0xFF333333),
       type: BottomNavigationBarType.fixed,
       elevation: 0,
     ),

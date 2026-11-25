@@ -80,8 +80,8 @@ void main() {
     expect(settings.scanRequestAddress, 0);
     expect(settings.scanConnectTimeout, 300);
     expect(settings.scanConcurrency, 32);
-    expect(settings.writeEnabled, isTrue);
-    expect(settings.confirmBeforeWrite, isFalse);
+    expect(settings.writeEnabled, isFalse);
+    expect(settings.confirmBeforeWrite, isTrue);
 
     await settings.setScanProtocol(ProtocolType.modbusRtuIp);
     await settings.setScanSubnetCidr('192.168.88.16/24');
@@ -125,8 +125,8 @@ void main() {
     expect(settings.scanUnitIdEnd, 10);
     expect(settings.scanConnectTimeout, 300);
     expect(settings.scanConcurrency, 32);
-    expect(settings.writeEnabled, isTrue);
-    expect(settings.confirmBeforeWrite, isFalse);
+    expect(settings.writeEnabled, isFalse);
+    expect(settings.confirmBeforeWrite, isTrue);
   });
 
   test('connection defaults persist and clamp out-of-range values', () async {

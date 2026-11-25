@@ -1,0 +1,752 @@
+{
+  "@@locale": "zh",
+  "appTitle": "现场Modbus",
+  "@appTitle": {},
+  "navDevices": "设备",
+  "@navDevices": {},
+  "navRegisters": "监测",
+  "@navRegisters": {},
+  "navLog": "报文",
+  "@navLog": {},
+  "navMore": "更多",
+  "@navMore": {},
+  "statusConnected": "已连接",
+  "@statusConnected": {},
+  "statusDisconnected": "未连接",
+  "@statusDisconnected": {},
+  "unitId": "站号: {id}",
+  "@unitId": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
+  "devicesSearch": "搜索设备",
+  "@devicesSearch": {},
+  "devicesSavedConnections": "已保存设备",
+  "@devicesSavedConnections": {},
+  "devicesMoreCount": "还有 {count} 个",
+  "@devicesMoreCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "devicesReorder": "排序",
+  "@devicesReorder": {},
+  "devicesShowAllCount": "查看全部（{count}）",
+  "@devicesShowAllCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "devicesDiscoveredDevices": "网络扫描",
+  "@devicesDiscoveredDevices": {},
+  "devicesDiscoveredTitle": "扫描到的设备",
+  "@devicesDiscoveredTitle": {},
+  "devicesClearDiscovered": "清除",
+  "@devicesClearDiscovered": {},
+  "devicesScanStop": "停止扫描",
+  "@devicesScanStop": {},
+  "devicesLastUsed": "最近使用",
+  "@devicesLastUsed": {},
+  "devicesConnect": "连接",
+  "@devicesConnect": {},
+  "devicesScanNetwork": "扫描网络",
+  "@devicesScanNetwork": {},
+  "devicesStartScanning": "开始扫描",
+  "@devicesStartScanning": {},
+  "devicesNoScansYet": "还没有扫描",
+  "@devicesNoScansYet": {},
+  "devicesNoScansYetSubtitle": "需要时再手动扫描。已知网关请直接填写 IP 和端口。",
+  "@devicesNoScansYetSubtitle": {},
+  "devicesScanningNetwork": "正在扫描网络",
+  "@devicesScanningNetwork": {},
+  "devicesScanCompleted": "扫描结束",
+  "@devicesScanCompleted": {},
+  "devicesScanCompletedTitle": "扫描结束",
+  "@devicesScanCompletedTitle": {},
+  "devicesScanningTitle": "正在扫描…",
+  "@devicesScanningTitle": {},
+  "devicesScanningSubtitle": "正在查找设备",
+  "@devicesScanningSubtitle": {},
+  "devicesScanningProtocolSubtitle": "正在查找 {protocol} 设备",
+  "@devicesScanningProtocolSubtitle": {
+    "placeholders": {
+      "protocol": {
+        "type": "String"
+      }
+    }
+  },
+  "devicesFoundCount": "找到 {count} 台",
+  "@devicesFoundCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "devicesScanStart": "开始: {time}",
+  "@devicesScanStart": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "devicesScanElapsed": "已用: {time}",
+  "@devicesScanElapsed": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "devicesScanDuration": "耗时: {time}",
+  "@devicesScanDuration": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "devicesScanSubnetUnavailable": "没有可用网段",
+  "@devicesScanSubnetUnavailable": {},
+  "devicesScanFound": "找到: {count}",
+  "@devicesScanFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "devicesScanProgress": "{scanned}/{total}",
+  "@devicesScanProgress": {
+    "placeholders": {
+      "scanned": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "protocolAndUnitId": "{protocol} • 站号 {unitId}",
+  "@protocolAndUnitId": {
+    "placeholders": {
+      "protocol": {
+        "type": "String"
+      },
+      "unitId": {
+        "type": "int"
+      }
+    }
+  },
+  "appBarName": "现场",
+  "@appBarName": {},
+  "appBarNameSuffix": "Modbus",
+  "@appBarNameSuffix": {},
+  "disconnect": "断开",
+  "@disconnect": {},
+  "readRegisters": "读寄存器",
+  "@readRegisters": {},
+  "readRegistersSubtitle": "读取保持/输入寄存器",
+  "@readRegistersSubtitle": {},
+  "writeValue": "写数值",
+  "@writeValue": {},
+  "writeValueSubtitle": "写寄存器或线圈",
+  "@writeValueSubtitle": {},
+  "lastValues": "上次的值",
+  "@lastValues": {},
+  "viewAll": "查看全部 >",
+  "@viewAll": {},
+  "openLog": "打开报文",
+  "@openLog": {},
+  "openLogSubtitle": "查看通信报文",
+  "@openLogSubtitle": {},
+  "tabCoils": "状态",
+  "@tabCoils": {},
+  "colAddress": "地址",
+  "@colAddress": {},
+  "colValue": "数值",
+  "@colValue": {},
+  "colType": "类型",
+  "@colType": {},
+  "colComment": "备注",
+  "@colComment": {},
+  "commentHint": "添加备注",
+  "@commentHint": {},
+  "btnRead": "读取",
+  "@btnRead": {},
+  "labelStart": "起始",
+  "@labelStart": {},
+  "labelCount": "数量",
+  "@labelCount": {},
+  "labelAutoRefresh": "自动刷新",
+  "@labelAutoRefresh": {},
+  "kbStartAddress": "起始地址",
+  "@kbStartAddress": {},
+  "kbCount": "数量",
+  "@kbCount": {},
+  "kbInterval": "刷新间隔，毫秒",
+  "@kbInterval": {},
+  "kbSearch": "搜索",
+  "@kbSearch": {},
+  "registersShowing": "显示 {start} – {end}",
+  "@registersShowing": {
+    "placeholders": {
+      "start": {
+        "type": "int"
+      },
+      "end": {
+        "type": "int"
+      }
+    }
+  },
+  "registersLastUpdate": "最近更新: {time}",
+  "@registersLastUpdate": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "filterAll": "全部",
+  "@filterAll": {},
+  "filterTx": "发送",
+  "@filterTx": {},
+  "filterRx": "接收",
+  "@filterRx": {},
+  "filterErrors": "错误",
+  "@filterErrors": {},
+  "labelAutoScroll": "自动滚动",
+  "@labelAutoScroll": {},
+  "colTime": "时间",
+  "@colTime": {},
+  "colDirection": "方向",
+  "@colDirection": {},
+  "colFunction": "功能码",
+  "@colFunction": {},
+  "logMessages": "报文: {count}",
+  "@logMessages": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "logClearOnDisconnect": "断开时清除",
+  "@logClearOnDisconnect": {},
+  "logClearTraffic": "清除报文",
+  "@logClearTraffic": {},
+  "trafficMbapHeader": "MBAP 头",
+  "@trafficMbapHeader": {},
+  "trafficRtuHeader": "RTU 帧",
+  "@trafficRtuHeader": {},
+  "trafficCrc": "CRC",
+  "@trafficCrc": {},
+  "trafficCrcStatus": "CRC 状态",
+  "@trafficCrcStatus": {},
+  "trafficCrcOk": "正确",
+  "@trafficCrcOk": {},
+  "trafficCrcInvalid": "无效",
+  "@trafficCrcInvalid": {},
+  "trafficPdu": "PDU",
+  "@trafficPdu": {},
+  "trafficDecoded": "解码",
+  "@trafficDecoded": {},
+  "trafficRawFrame": "原始帧",
+  "@trafficRawFrame": {},
+  "trafficTransactionId": "事务号",
+  "@trafficTransactionId": {},
+  "trafficProtocolId": "协议号",
+  "@trafficProtocolId": {},
+  "trafficLength": "长度",
+  "@trafficLength": {},
+  "trafficUnitId": "站号",
+  "@trafficUnitId": {},
+  "trafficFunctionCode": "功能码",
+  "@trafficFunctionCode": {},
+  "trafficCopyHex": "复制十六进制",
+  "@trafficCopyHex": {},
+  "trafficHexCopied": "帧已复制",
+  "@trafficHexCopied": {},
+  "trafficNoFrame": "没有帧数据",
+  "@trafficNoFrame": {},
+  "editDevice": "编辑设备",
+  "@editDevice": {},
+  "addDevice": "添加设备",
+  "@addDevice": {},
+  "deviceDeleted": "设备已删除",
+  "@deviceDeleted": {},
+  "undo": "撤销",
+  "@undo": {},
+  "connectToDevice": "连接到设备",
+  "@connectToDevice": {},
+  "cancel": "取消",
+  "@cancel": {},
+  "save": "保存",
+  "@save": {},
+  "done": "完成",
+  "@done": {},
+  "connect": "连接",
+  "@connect": {},
+  "errorConnectionTitle": "连接失败",
+  "@errorConnectionTitle": {},
+  "errorConnectionBody": "无法到达 {address}。请检查 IP、端口和网络。",
+  "@errorConnectionBody": {
+    "placeholders": {
+      "address": {
+        "type": "String"
+      }
+    }
+  },
+  "errorConnectionBodyUnknown": "无法到达设备。请检查 IP、端口和网络。",
+  "@errorConnectionBodyUnknown": {},
+  "errorTimeoutTitle": "请求超时",
+  "@errorTimeoutTitle": {},
+  "errorTimeoutBody": "设备没有在时限内应答。可加大超时，或检查网络和设备负载。",
+  "@errorTimeoutBody": {},
+  "errorModbusTitle": "设备返回错误",
+  "@errorModbusTitle": {},
+  "errorModbusBody": "Modbus 异常: {message}。",
+  "@errorModbusBody": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "errorNotConnectedTitle": "设备未连接",
+  "@errorNotConnectedTitle": {},
+  "errorNotConnectedBody": "请先连接设备再试。",
+  "@errorNotConnectedBody": {},
+  "errorGenericTitle": "操作没有完成",
+  "@errorGenericTitle": {},
+  "connectionType": "通信方式",
+  "@connectionType": {},
+  "connectTypeTcp": "Modbus TCP",
+  "@connectTypeTcp": {},
+  "connectTypeTcpSub": "标准 MBAP",
+  "@connectTypeTcpSub": {},
+  "connectTypeRtu": "RTU over TCP",
+  "@connectTypeRtu": {},
+  "connectTypeRtuSub": "带 CRC 的原始 RTU 帧",
+  "@connectTypeRtuSub": {},
+  "labelName": "名称",
+  "@labelName": {},
+  "deviceMarkerColor": "标记颜色",
+  "@deviceMarkerColor": {},
+  "deviceMarkerColorBlue": "蓝",
+  "@deviceMarkerColorBlue": {},
+  "deviceMarkerColorGreen": "绿",
+  "@deviceMarkerColorGreen": {},
+  "deviceMarkerColorAmber": "琥珀",
+  "@deviceMarkerColorAmber": {},
+  "deviceMarkerColorRed": "红",
+  "@deviceMarkerColorRed": {},
+  "deviceMarkerColorPurple": "紫",
+  "@deviceMarkerColorPurple": {},
+  "deviceMarkerColorTeal": "青",
+  "@deviceMarkerColorTeal": {},
+  "deviceMarkerColorGray": "灰",
+  "@deviceMarkerColorGray": {},
+  "nameRequired": "名称不能为空",
+  "@nameRequired": {},
+  "nameAlreadyExists": "名称已存在",
+  "@nameAlreadyExists": {},
+  "labelHost": "主机 / IP",
+  "@labelHost": {},
+  "labelPort": "端口",
+  "@labelPort": {},
+  "labelUnitIdField": "站号（从站地址）",
+  "@labelUnitIdField": {},
+  "labelTimeout": "超时",
+  "@labelTimeout": {},
+  "labelReconnectDelay": "重连间隔",
+  "@labelReconnectDelay": {},
+  "labelNotes": "备注（可选）",
+  "@labelNotes": {},
+  "notesHint": "记录这条连接的说明",
+  "@notesHint": {},
+  "labelPreviousValue": "上次的值",
+  "@labelPreviousValue": {},
+  "labelInterpretations": "数据解释",
+  "@labelInterpretations": {},
+  "labelProperties": "属性",
+  "@labelProperties": {},
+  "labelRegisterOrder": "字序",
+  "@labelRegisterOrder": {},
+  "labelByteOrder": "字节序",
+  "@labelByteOrder": {},
+  "writeRegisterTitle": "写寄存器",
+  "@writeRegisterTitle": {},
+  "btnWrite": "写入",
+  "@btnWrite": {},
+  "labelNewValue": "新值",
+  "@labelNewValue": {},
+  "writeValueRange": "数值必须在 0 – 65535",
+  "@writeValueRange": {},
+  "writeCoilTitle": "写线圈",
+  "@writeCoilTitle": {},
+  "writeCoilConfirm": "把线圈 {address} 写成 {value}？",
+  "@writeCoilConfirm": {
+    "placeholders": {
+      "address": {
+        "type": "int"
+      },
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "writeModeRegister": "寄存器",
+  "@writeModeRegister": {},
+  "writeModeCoil": "线圈",
+  "@writeModeCoil": {},
+  "writeDataType": "数据类型",
+  "@writeDataType": {},
+  "writeRawWords": "原始寄存器",
+  "@writeRawWords": {},
+  "writeValueHelper": "将写入指定寄存器的值。",
+  "@writeValueHelper": {},
+  "writeConfirmTitle": "确认写入",
+  "@writeConfirmTitle": {},
+  "writeRegisterConfirm": "把地址 {address} 的 {type} 写成 {value}？",
+  "@writeRegisterConfirm": {
+    "placeholders": {
+      "type": {},
+      "address": {
+        "type": "int"
+      },
+      "value": {}
+    }
+  },
+  "writeCoilConfirmDetailed": "把线圈 {address} 写成 {value}？",
+  "@writeCoilConfirmDetailed": {
+    "placeholders": {
+      "address": {
+        "type": "int"
+      },
+      "value": {}
+    }
+  },
+  "writeSuccess": "写入完成",
+  "@writeSuccess": {},
+  "writeResult": "结果",
+  "@writeResult": {},
+  "writeActualValue": "读回值",
+  "@writeActualValue": {},
+  "writeFallbackUsed": "已改用功能码 06 逐个写入",
+  "@writeFallbackUsed": {},
+  "writeDisabled": "设置里已关闭写入",
+  "@writeDisabled": {},
+  "writeAddressRange": "地址超出范围",
+  "@writeAddressRange": {},
+  "writeInvalidValue": "数值无效",
+  "@writeInvalidValue": {},
+  "writeOn": "开",
+  "@writeOn": {},
+  "writeOff": "关",
+  "@writeOff": {},
+  "sectionRegisterLists": "寄存器列表",
+  "@sectionRegisterLists": {},
+  "noRegisterLists": "还没有寄存器列表",
+  "@noRegisterLists": {},
+  "menuSelectDevice": "选择设备",
+  "@menuSelectDevice": {},
+  "menuAddRegs": "新建列表",
+  "@menuAddRegs": {},
+  "menuSelectRegsList": "切换列表",
+  "@menuSelectRegsList": {},
+  "menuRemoveRegs": "删除列表",
+  "@menuRemoveRegs": {},
+  "dialogListNameHint": "列表名称",
+  "@dialogListNameHint": {},
+  "labelRegisterType": "寄存器类型",
+  "@labelRegisterType": {},
+  "menuSetAllTypes": "全部设为该类型",
+  "@menuSetAllTypes": {},
+  "settingsTitle": "设置",
+  "@settingsTitle": {},
+  "settingsSectionConnection": "连接",
+  "@settingsSectionConnection": {},
+  "settingsDefaultConnectionType": "默认通信方式",
+  "@settingsDefaultConnectionType": {},
+  "settingsDefaultTimeout": "默认超时",
+  "@settingsDefaultTimeout": {},
+  "settingsReconnectDelay": "重连间隔",
+  "@settingsReconnectDelay": {},
+  "settingsDefaultUnitId": "默认站号",
+  "@settingsDefaultUnitId": {},
+  "settingsSectionNetworkScan": "网络扫描",
+  "@settingsSectionNetworkScan": {},
+  "settingsScanProtocol": "扫描协议",
+  "@settingsScanProtocol": {},
+  "settingsScanSubnetCidr": "扫描网段",
+  "@settingsScanSubnetCidr": {},
+  "settingsScanSubnetAuto": "自动（Wi-Fi）",
+  "@settingsScanSubnetAuto": {},
+  "settingsScanSubnetPrefix": "当前子网掩码",
+  "@settingsScanSubnetPrefix": {},
+  "settingsScanPortRange": "端口范围",
+  "@settingsScanPortRange": {},
+  "settingsScanUnitIdRange": "站号范围",
+  "@settingsScanUnitIdRange": {},
+  "settingsScanRequestType": "探测请求",
+  "@settingsScanRequestType": {},
+  "settingsScanRequestAddress": "探测地址",
+  "@settingsScanRequestAddress": {},
+  "settingsScanRequestCoils": "读线圈",
+  "@settingsScanRequestCoils": {},
+  "settingsScanRequestDiscreteInputs": "读离散输入",
+  "@settingsScanRequestDiscreteInputs": {},
+  "settingsScanRequestHoldingRegisters": "读保持寄存器",
+  "@settingsScanRequestHoldingRegisters": {},
+  "settingsScanRequestInputRegisters": "读输入寄存器",
+  "@settingsScanRequestInputRegisters": {},
+  "settingsScanConnectTimeout": "连接超时",
+  "@settingsScanConnectTimeout": {},
+  "settingsScanConcurrency": "并发探测数",
+  "@settingsScanConcurrency": {},
+  "settingsScanClearOnStart": "新扫描时清除结果",
+  "@settingsScanClearOnStart": {},
+  "settingsRangeStart": "起",
+  "@settingsRangeStart": {},
+  "settingsRangeEnd": "止",
+  "@settingsRangeEnd": {},
+  "settingsSectionReadWrite": "监测",
+  "@settingsSectionReadWrite": {},
+  "settingsDefaultReadQty": "默认读取数量",
+  "@settingsDefaultReadQty": {},
+  "settingsWriteEnabled": "允许写入",
+  "@settingsWriteEnabled": {},
+  "settingsConfirmBeforeCoilWrite": "写线圈前确认",
+  "@settingsConfirmBeforeCoilWrite": {},
+  "settingsConfirmBeforeWrite": "写线圈前确认",
+  "@settingsConfirmBeforeWrite": {},
+  "settingsShowLastValues": "读取后显示上次的值",
+  "@settingsShowLastValues": {},
+  "settingsShowTypeBadges": "显示类型标记",
+  "@settingsShowTypeBadges": {},
+  "settingsSectionLog": "报文",
+  "@settingsSectionLog": {},
+  "settingsSaveLogToFile": "报文保存到文件",
+  "@settingsSaveLogToFile": {},
+  "settingsClearLogOnDisconnect": "断开时清除报文",
+  "@settingsClearLogOnDisconnect": {},
+  "settingsMaxLogEntries": "报文条数上限",
+  "@settingsMaxLogEntries": {},
+  "settingsSectionAppearance": "外观",
+  "@settingsSectionAppearance": {},
+  "settingsTheme": "主题",
+  "@settingsTheme": {},
+  "settingsThemeSystem": "跟随系统",
+  "@settingsThemeSystem": {},
+  "settingsThemeLight": "浅色",
+  "@settingsThemeLight": {},
+  "settingsThemeDark": "深色",
+  "@settingsThemeDark": {},
+  "settingsLanguage": "语言",
+  "@settingsLanguage": {},
+  "settingsLanguageSystem": "跟随系统",
+  "@settingsLanguageSystem": {},
+  "settingsLanguageEnglish": "English",
+  "@settingsLanguageEnglish": {},
+  "settingsLanguageRussian": "Русский",
+  "@settingsLanguageRussian": {},
+  "settingsSectionOther": "其他",
+  "@settingsSectionOther": {},
+  "settingsBackupRestore": "备份与恢复",
+  "@settingsBackupRestore": {},
+  "settingsBackupExport": "导出备份",
+  "@settingsBackupExport": {},
+  "settingsBackupImport": "导入备份",
+  "@settingsBackupImport": {},
+  "settingsBackupImportConfirmMessage": "导入会替换当前设置和已保存的设备。",
+  "@settingsBackupImportConfirmMessage": {},
+  "settingsBackupExportSuccess": "备份已导出",
+  "@settingsBackupExportSuccess": {},
+  "settingsBackupImportSuccess": "备份已导入",
+  "@settingsBackupImportSuccess": {},
+  "settingsBackupFailure": "备份操作失败",
+  "@settingsBackupFailure": {},
+  "settingsResetDefaults": "恢复默认",
+  "@settingsResetDefaults": {},
+  "settingsResetAction": "恢复",
+  "@settingsResetAction": {},
+  "settingsResetConfirmMessage": "所有设置将恢复为默认值。",
+  "@settingsResetConfirmMessage": {},
+  "settingsSummaryPort": "端口 {value}",
+  "@settingsSummaryPort": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsSummaryEntries": "{value} 条",
+  "@settingsSummaryEntries": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsSummaryAddressBase": "{value}",
+  "@settingsSummaryAddressBase": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsSummaryResetAndAbout": "恢复与关于",
+  "@settingsSummaryResetAndAbout": {},
+  "labelCurrentValue": "当前值",
+  "@labelCurrentValue": {},
+  "settingsReadFailureAttempts": "读取失败重试次数",
+  "@settingsReadFailureAttempts": {},
+  "settingsAddressBase": "地址基准",
+  "@settingsAddressBase": {},
+  "deviceNotConnected": "{name} 未连接。",
+  "@deviceNotConnected": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsValueMs": "{value} 毫秒",
+  "@settingsValueMs": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "aboutTitle": "关于",
+  "@aboutTitle": {},
+  "aboutApplication": "应用",
+  "@aboutApplication": {},
+  "aboutVersion": "版本",
+  "@aboutVersion": {},
+  "aboutBuildDate": "构建时间",
+  "@aboutBuildDate": {},
+  "aboutLicense": "许可证",
+  "@aboutLicense": {},
+  "aboutWebsite": "网站",
+  "@aboutWebsite": {},
+  "aboutEmail": "邮箱",
+  "@aboutEmail": {},
+  "aboutDocumentation": "文档",
+  "@aboutDocumentation": {},
+  "aboutReportIssue": "反馈问题",
+  "@aboutReportIssue": {},
+  "aboutCopyright": "Copyright © {year} Alexandr Ananev",
+  "@aboutCopyright": {
+    "placeholders": {
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "aboutLicenseMit": "MIT 许可证",
+  "@aboutLicenseMit": {},
+  "settingsLanguageChinese": "中文",
+  "@settingsLanguageChinese": {},
+  "gatewayConnectAction": "连接网关",
+  "@gatewayConnectAction": {},
+  "gatewayConnectTitle": "连接便携网关",
+  "@gatewayConnectTitle": {},
+  "gatewayConnectBody": "手机通过 Wi-Fi 的 TCP 连接网关。请选择 Modbus TCP（MBAP）或 RTU over TCP（带 CRC 的原始帧）。填写网关 IP 和端口。仅 TCP 连通不算已收到 Modbus 应答。",
+  "@gatewayConnectBody": {},
+  "protocolTcpDetail": "Modbus TCP：手机 TCP 套接字上的 MBAP 头，没有 CRC。",
+  "@protocolTcpDetail": {},
+  "protocolRtuDetail": "RTU over TCP：手机 TCP 套接字上的原始 RTU 帧，带 CRC。这不是 Modbus TCP。",
+  "@protocolRtuDetail": {},
+  "protocolGatewayWarning": "并非所有 RS485 网关都会在两种帧格式之间转换。请选择网关实际使用的模式。",
+  "@protocolGatewayWarning": {},
+  "rtuSecondMasterWarning": "警告：总线上如果已有主站，再接入会干扰通信。不要在正在工作的 RTU 总线上做第二个主站。",
+  "@rtuSecondMasterWarning": {},
+  "serialWiringTitle": "RS485 接线记录",
+  "@serialWiringTitle": {},
+  "serialWiringNote": "波特率、校验、停止位和端口只作记录。未知网关没有管理接口，本应用不会把这些参数下发下去。",
+  "@serialWiringNote": {},
+  "serialBaud": "波特率（仅记录）",
+  "@serialBaud": {},
+  "serialParity": "校验（仅记录）",
+  "@serialParity": {},
+  "serialStopBits": "停止位（仅记录）",
+  "@serialStopBits": {},
+  "serialPortLabel": "RS485 端口标注（仅记录）",
+  "@serialPortLabel": {},
+  "serialParityNone": "无",
+  "@serialParityNone": {},
+  "serialParityEven": "偶",
+  "@serialParityEven": {},
+  "serialParityOdd": "奇",
+  "@serialParityOdd": {},
+  "transportSectionTitle": "手机连接方式",
+  "@transportSectionTitle": {},
+  "transportWifi": "Wi-Fi TCP",
+  "@transportWifi": {},
+  "transportWifiDetail": "本版已实现。手机向网关打开 TCP 连接。",
+  "@transportWifiDetail": {},
+  "transportUsb": "USB OTG RS485",
+  "@transportUsb": {},
+  "transportBluetooth": "蓝牙",
+  "@transportBluetooth": {},
+  "transportUnavailable": "本版不可用。这里不会打开该连接。",
+  "@transportUnavailable": {},
+  "linkTcpOpen": "TCP 已打开，尚未收到 Modbus 应答",
+  "@linkTcpOpen": {},
+  "scanBoundsNote": "扫描必须手动开始，最多 256 个主机、4 个端口、4096 次探测，不会自动扫工厂网络。已知地址请直接填写。",
+  "@scanBoundsNote": {},
+  "scanRejected": "扫描没有开始。请缩小网段、端口或站号，或手工填写网关地址。",
+  "@scanRejected": {},
+  "unitIdInvalid": "站号必须是 1–247。站号 0 是广播地址，这里不使用。",
+  "@unitIdInvalid": {},
+  "writeDeniedTitle": "写入已被阻止",
+  "@writeDeniedTitle": {},
+  "writeDeniedDisabled": "写入处于关闭。请先在设置中打开“允许写入”，并逐次确认。",
+  "@writeDeniedDisabled": {},
+  "writeDeniedBroadcast": "站号 0 是 Modbus 广播地址。本应用不会发送它。",
+  "@writeDeniedBroadcast": {},
+  "writeConfirmEndpoint": "端点",
+  "@writeConfirmEndpoint": {},
+  "writeConfirmUnit": "站号",
+  "@writeConfirmUnit": {},
+  "writeConfirmFunction": "功能码",
+  "@writeConfirmFunction": {},
+  "writeConfirmPdu": "PDU 地址（从 0 起）",
+  "@writeConfirmPdu": {},
+  "writeConfirmReference": "参考标签",
+  "@writeConfirmReference": {},
+  "writeConfirmOld": "原值",
+  "@writeConfirmOld": {},
+  "writeConfirmOldUnknown": "未知 — 本次没有读到",
+  "@writeConfirmOldUnknown": {},
+  "writeConfirmNew": "新值",
+  "@writeConfirmNew": {},
+  "demoDataBanner": "演示数据 — 不是现场设备的实时应答",
+  "@demoDataBanner": {},
+  "aboutFieldEdition": "Android 现场版。完全离线，不需要登录，也不依赖云。",
+  "@aboutFieldEdition": {},
+  "aboutUpstream": "基于 Alexandr Ananev 的 OpenModScan Mobile，MIT 许可证。上游：github.com/sanny32/OpenModScan-Mobile。",
+  "@aboutUpstream": {},
+  "aboutNoHardware": "此构建没有在真实 RS485 或网关硬件上验证过。",
+  "@aboutNoHardware": {},
+  "scaleTitle": "工程量换算",
+  "@scaleTitle": {},
+  "scaleGain": "倍率",
+  "@scaleGain": {},
+  "scaleOffset": "偏移",
+  "@scaleOffset": {},
+  "scaleNote": "只影响显示：显示值 = 原始值 × 倍率 + 偏移。Modbus 帧本身不换算。倍率为 1、偏移为 0 时保持原始值。",
+  "@scaleNote": {}
+}

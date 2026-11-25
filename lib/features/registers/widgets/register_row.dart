@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 
+import '../../../field/write_plan.dart';
 import '../../../l10n/l10n.dart';
 import '../../../models/app_settings.dart';
+import '../../../models/device_info.dart';
 import '../../../models/register_address_type.dart';
 import '../../../models/register_entry.dart';
 import '../../../theme/app_theme.dart';
 import '../../../utils/modbus_format.dart';
 import '../../../utils/value_input.dart';
 import '../../../widgets/error_feedback.dart';
+import '../../../widgets/write_confirm_body.dart';
 import '../../../widgets/type_badge.dart';
 import '../register_detail_screen.dart';
 import '../register_runtime_value.dart';
@@ -25,6 +28,8 @@ class RegisterRow extends StatelessWidget {
   onValueWritten;
   final Listenable? valuesListenable;
   final RegisterRuntimeValue? Function(int address)? liveValueAt;
+  final DeviceInfo? device;
+  final void Function(int address, double scale, double offset)? onScaleChanged;
 
   const RegisterRow({
     super.key,
@@ -38,6 +43,8 @@ class RegisterRow extends StatelessWidget {
     this.onValueWritten,
     this.valuesListenable,
     this.liveValueAt,
+    this.device,
+    this.onScaleChanged,
   });
 
   @override
@@ -64,6 +71,10 @@ class RegisterRow extends StatelessWidget {
             onValueWritten: onValueWritten != null
                 ? (v, type) => onValueWritten!(entry.address, v, type)
                 : null,
+            onScaleChanged: onScaleChanged == null
+                ? null
+                : (scale, offset) =>
+                      onScaleChanged!(entry.address, scale, offset),
             valuesListenable: valuesListenable,
             liveValueAt: liveValueAt,
           ),
@@ -72,7 +83,13 @@ class RegisterRow extends StatelessWidget {
     }
 
     void showWriteDialog() {
-      _showWriteRegisterDialog(context, entry, referenceAddress, onValueWritten);
+      _showWriteRegisterDialog(
+        context,
+        entry,
+        referenceAddress,
+        onValueWritten,
+        device: device,
+      );
     }
 
     return Column(
@@ -112,6 +129,14 @@ class RegisterRow extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text('$referenceAddress', style: tt.bodyLarge),
+                      if (entry.valueState == RegisterValueState.demonstration)
+                        Text(
+                          'DEMO',
+                          style: tt.labelSmall!.copyWith(
+                            color: appColors.warningColor,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
                       ValueListenableBuilder<bool>(
                         valueListenable:
                             AppSettings.instance.showTypeBadgesNotifier,
@@ -235,12 +260,14 @@ Future<void> _showWriteRegisterDialog(
   RegisterEntry entry,
   int referenceAddress,
   Future<String?> Function(int address, String value, String typeName)?
-  onValueWritten,
-) async {
+  onValueWritten, {
+  DeviceInfo? device,
+}) async {
   final l10n = context.l10n;
   final cs = Theme.of(context).colorScheme;
   final tt = Theme.of(context).textTheme;
-  final ctrl = TextEditingController(text: entry.displayValue ?? entry.value);
+  final rawValue = rawTypedRegisterValue(entry);
+  final ctrl = TextEditingController(text: rawValue);
   String? error;
   var writing = false;
 
@@ -289,6 +316,25 @@ Future<void> _showWriteRegisterDialog(
                 ),
               ],
             ),
+            if (device != null) ...[
+              const SizedBox(height: 8),
+              ValueListenableBuilder<TextEditingValue>(
+                valueListenable: ctrl,
+                builder: (_, value, _) => WriteConfirmBody(
+                  plan: WritePlan.holding(
+                    device: device,
+                    displayAddress: entry.address,
+                    addressBase: AppSettings.instance.addressBaseStart,
+                    wordCount: registerWordCount(entry.typeName),
+                    newValue: value.text,
+                    knownOldValue:
+                        entry.valueState == RegisterValueState.received
+                        ? rawValue
+                        : null,
+                  ),
+                ),
+              ),
+            ],
             const SizedBox(height: 4),
             Row(
               children: [
@@ -369,6 +415,7 @@ Color _valueColor(BuildContext context, RegisterValueState state) {
     RegisterValueState.received => appColors.valueColor,
     RegisterValueState.unavailable => appColors.unavailableValueColor,
     RegisterValueState.exception => appColors.exceptionValueColor,
+    RegisterValueState.demonstration => appColors.warningColor,
   };
 }
 

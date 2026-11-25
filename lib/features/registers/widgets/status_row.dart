@@ -76,6 +76,16 @@ class StatusRow extends StatelessWidget {
                 style: tt.bodyLarge,
               ),
             ),
+            if (entry.demonstration) ...[
+              Text(
+                'DEMO',
+                style: tt.labelSmall?.copyWith(
+                  color: appColors.warningColor,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(width: 6),
+            ],
             Expanded(
               child: Text(
                 entry.comment,

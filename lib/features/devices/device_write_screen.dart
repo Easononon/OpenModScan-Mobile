@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../field/write_plan.dart';
 import '../../l10n/l10n.dart';
 import '../../widgets/keyboard_done_bar.dart';
 import '../../models/app_settings.dart';
@@ -11,6 +12,7 @@ import '../../theme/app_dimens.dart';
 import '../../utils/modbus_format.dart';
 import '../../widgets/app_switch.dart';
 import '../../widgets/app_test_keys.dart';
+import '../../widgets/write_confirm_body.dart';
 import '../../widgets/connection_info_bar.dart';
 import '../../widgets/data_layout.dart';
 import '../../widgets/error_feedback.dart';
@@ -227,27 +229,40 @@ class _DeviceWriteScreenState extends State<DeviceWriteScreen> {
         ? _valueCtrl.text.trim()
         : (_coilValue ? l10n.writeOn : l10n.writeOff);
 
+    final displayAddress = address + _addressType.displayOffset;
+    final plan = isRegister
+        ? WritePlan.holding(
+            device: _device,
+            displayAddress: displayAddress,
+            addressBase: AppSettings.instance.addressBaseStart,
+            wordCount: words?.length ?? 1,
+            newValue: valueLabel,
+          )
+        : WritePlan.coil(
+            device: _device,
+            displayAddress: displayAddress,
+            addressBase: AppSettings.instance.addressBaseStart,
+            newValue: valueLabel,
+          );
     return showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(l10n.writeConfirmTitle),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              isRegister
-                  ? l10n.writeRegisterConfirm(_typeName, address, valueLabel)
-                  : l10n.writeCoilConfirmDetailed(address, valueLabel),
-            ),
-            if (isRegister && words != null) ...[
-              const SizedBox(height: 12),
-              Text(
-                '${l10n.writeRawWords}: ${_formatWords(words)}',
-                style: Theme.of(ctx).textTheme.bodyMedium,
-              ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              WriteConfirmBody(plan: plan),
+              if (isRegister && words != null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  '${l10n.writeRawWords}: ${_formatWords(words)}',
+                  style: Theme.of(ctx).textTheme.bodyMedium,
+                ),
+              ],
             ],
-          ],
+          ),
         ),
         actions: [
           TextButton(

@@ -137,6 +137,33 @@ class _AboutScreenState extends State<AboutScreen> {
               ],
             ),
           ),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Text(
+              l10n.aboutFieldEdition,
+              style: tt.bodyMedium?.copyWith(color: cs.onSurface),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Text(
+              l10n.aboutUpstream,
+              style: tt.bodyMedium?.copyWith(color: cs.onSurface),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Text(
+              l10n.aboutNoHardware,
+              style: tt.bodyMedium?.copyWith(
+                color: cs.error,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
           const SizedBox(height: 24),
 
           Center(child: _copyrightValue(context)),

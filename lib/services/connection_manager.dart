@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import '../field/write_guard.dart';
 import '../models/app_settings.dart';
 import '../models/device_info.dart';
 import '../runtime/runtime_ports.dart';
@@ -21,6 +22,10 @@ class ConnectionManager implements ConnectionRuntime {
   @override
   bool isConnected(DeviceInfo device) =>
       clients.value[device.id]?.isConnected ?? false;
+
+  /// False when the TCP socket is open but no Modbus response has been decoded.
+  bool isModbusVerified(DeviceInfo device) =>
+      clients.value[device.id]?.isModbusVerified ?? false;
 
   @visibleForTesting
   Future<void> resetForTesting() async {
@@ -95,21 +100,37 @@ class ConnectionManager implements ConnectionRuntime {
     DeviceInfo device, {
     required int address,
     required int value,
-  }) => _clientFor(device).writeHoldingRegister(address, value);
+  }) {
+    _guardWrite(device);
+    return _clientFor(device).writeHoldingRegister(address, value);
+  }
 
   @override
   Future<bool> writeHoldingRegisters(
     DeviceInfo device, {
     required int startAddress,
     required List<int> values,
-  }) => _clientFor(device).writeHoldingRegisters(startAddress, values);
+  }) {
+    _guardWrite(device);
+    return _clientFor(device).writeHoldingRegisters(startAddress, values);
+  }
 
   @override
   Future<void> writeCoil(
     DeviceInfo device, {
     required int address,
     required bool value,
-  }) => _clientFor(device).writeCoil(address, value);
+  }) {
+    _guardWrite(device);
+    return _clientFor(device).writeCoil(address, value);
+  }
+
+  void _guardWrite(DeviceInfo device) {
+    enforceWriteAllowed(
+      writeEnabled: AppSettings.instance.writeEnabled,
+      unitId: device.unitId,
+    );
+  }
 
   /// Runs a read [op], retrying up to `readFailureAttempts` times. Between
   /// failed attempts it waits the device's `reconnectDelay` and makes a
@@ -134,6 +155,13 @@ class ConnectionManager implements ConnectionRuntime {
     }
     return client;
   }
+}
+
+/// Test doubles have no separate socket phase, so a connected fake is treated
+/// as verified. The real [ConnectionManager] reports a decoded Modbus response.
+bool runtimeModbusVerified(ConnectionRuntime runtime, DeviceInfo device) {
+  if (runtime is ConnectionManager) return runtime.isModbusVerified(device);
+  return runtime.isConnected(device);
 }
 
 /// Attempts [read] up to [attempts] times (at least once). After a failed

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../field/write_guard.dart';
 import '../../models/app_settings.dart';
 import '../../models/device_info.dart';
 import '../../models/register_address_type.dart';
@@ -8,6 +9,7 @@ import '../../models/register_list.dart';
 import '../../models/status_entry.dart';
 import '../../navigation/navigation_targets.dart';
 import '../../runtime/runtime_ports.dart';
+import '../../services/connection_manager.dart';
 import '../../services/device_repository.dart';
 import '../../utils/modbus_format.dart';
 import 'register_runtime_value.dart';
@@ -66,6 +68,9 @@ class RegistersController extends ChangeNotifier {
       _latestReadAt(_runtimeStatusValues.values.map((value) => value.readAt));
 
   bool isConnected(DeviceInfo device) => _connectionRuntime.isConnected(device);
+
+  bool isModbusVerified(DeviceInfo device) =>
+      runtimeModbusVerified(_connectionRuntime, device);
 
   List<DeviceInfo> get connectedDevices =>
       devices.where(_connectionRuntime.isConnected).toList();
@@ -165,6 +170,13 @@ class RegistersController extends ChangeNotifier {
       address,
       addressBase: _settings.addressBaseStart,
     );
+    RegisterConfig? existing;
+    for (final entry in list.entries) {
+      if (entry.address == canonicalAddress) {
+        existing = entry;
+        break;
+      }
+    }
     await _repository.upsertRegisterConfig(
       device.id,
       list.id,
@@ -172,6 +184,41 @@ class RegistersController extends ChangeNotifier {
         address: canonicalAddress,
         typeName: typeName,
         comment: comment,
+        scale: existing?.scale ?? 1,
+        offset: existing?.offset ?? 0,
+      ),
+    );
+  }
+
+  Future<void> updateEngineeringScale(
+    int address,
+    double scale,
+    double offset,
+  ) async {
+    final device = selectedDevice;
+    final list = activeList;
+    if (device == null || list == null) return;
+    final addressType = RegisterAddressType.fromCode(list.regType);
+    final canonicalAddress = addressType.toCanonicalAddress(
+      address,
+      addressBase: _settings.addressBaseStart,
+    );
+    RegisterConfig? existing;
+    for (final entry in list.entries) {
+      if (entry.address == canonicalAddress) {
+        existing = entry;
+        break;
+      }
+    }
+    await _repository.upsertRegisterConfig(
+      device.id,
+      list.id,
+      RegisterConfig(
+        address: canonicalAddress,
+        typeName: existing?.typeName ?? 'UInt16',
+        comment: existing?.comment,
+        scale: scale,
+        offset: offset,
       ),
     );
   }
@@ -227,6 +274,7 @@ class RegistersController extends ChangeNotifier {
     final device = selectedDevice;
     if (device == null) return null;
     if (!_settings.writeEnabled) return null;
+    enforceNoBroadcastWrite(device.unitId);
     if (!_connectionRuntime.isConnected(device)) {
       throw StateError('${device.name} is not connected.');
     }
@@ -302,6 +350,7 @@ class RegistersController extends ChangeNotifier {
     final device = selectedDevice;
     if (device == null) return null;
     if (!_settings.writeEnabled) return null;
+    enforceNoBroadcastWrite(device.unitId);
     if (!_connectionRuntime.isConnected(device)) {
       throw StateError('${device.name} is not connected.');
     }
